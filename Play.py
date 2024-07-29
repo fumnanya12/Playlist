@@ -1,9 +1,14 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import os
+from dotenv import load_dotenv
+
+# Load environment variables fclearom .env file
+load_dotenv()
 
 # Replace with your own Spotify Developer credentials
-CLIENT_ID = '5e5791dfd3c2403186d74ead71ca4b7e'
-CLIENT_SECRET = '7b98b90cfd8647b3b40dd009bd4e54d7'
+CLIENT_ID = os.getenv('API_ID')
+CLIENT_SECRET = os.getenv('API_KEY')
 
 # Authentication - without user
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID,
