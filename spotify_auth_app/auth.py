@@ -25,7 +25,7 @@ def login():
         'response_type': 'code',
         'client_id': SPOTIPY_CLIENT_ID,
         'redirect_uri': SPOTIPY_REDIRECT_URI,
-        'scope': 'user-library-read'
+        'scope': 'user-library-read playlist-read-private playlist-read-collaborative'
     }
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
@@ -59,17 +59,30 @@ def callback():
 @app.route('/profile')
 def profile():
     access_token = session.get('access_token')
-    print("The access_token is",access_token);
-   # print(session)
+    #print("The access_token is",access_token);
+    # print(session)
     if not access_token:
         return redirect(url_for('login'))
-
+    # Fetch user profile information
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
-    print(profile_json)
+   # print(profile_json)
+    # Fetch user playlists
+    playlists_r = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers)
+    # playlists_json = playlists_r.json()
+    # test= playlists_json.get('items', [])
+    # for testlist in test:
+    #     ownerlist= testlist.get("owner")
+    #     print(ownerlist)
+    # Generate HTML content for playlists
+    playlists_html = '<h2>Your Playlists:</h2><ul>'
+    for playlist in playlists_json.get('items', []):
+        playlists_html += f'<li>{playlist.get("name")}</li>'
+    playlists_html += '</ul>'
+    result= f'Hello, {profile_json.get("display_name")}!<br>{playlists_html}'
 
-    return f'Hello, {profile_json.get("display_name")}!'
+    return result
 
 if __name__ == '__main__':
     app.run(debug=True)
