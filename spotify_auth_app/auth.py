@@ -70,7 +70,7 @@ def profile():
    # print(profile_json)
     # Fetch user playlists
     playlists_r = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers)
-    # playlists_json = playlists_r.json()
+    playlists_json = playlists_r.json()
     # test= playlists_json.get('items', [])
     # for testlist in test:
     #     ownerlist= testlist.get("owner")
