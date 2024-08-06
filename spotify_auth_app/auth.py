@@ -1,9 +1,12 @@
+from dotenv import load_dotenv
 from flask import Flask, redirect, request, session, url_for
 import requests
 import os
-
+# Load environment variables fclearom .env file
+load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
 
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('API_ID')
@@ -80,9 +83,21 @@ def profile():
     for playlist in playlists_json.get('items', []):
         playlists_html += f'<li>{playlist.get("name")}</li>'
     playlists_html += '</ul>'
-    result= f'Hello, {profile_json.get("display_name")}!<br>{playlists_html}'
+    result= f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Spotify Profile</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
+    </head>
+    <body>
+        <h1>Hello, {profile_json.get("display_name")}!</h1>
+        {playlists_html}
+    </body>
+    </html>
+    '''
 
     return result
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
