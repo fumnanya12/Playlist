@@ -19,7 +19,29 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 @app.route('/')
 def index():
-    return 'Welcome to the Spotify OAuth app! <a href="/login">Login with Spotify</a>'
+    result= f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Welcome page</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
+
+    </head>
+    <body>
+    
+     <div class="container">
+            <div class="loader" id="loader"></div>
+            <div class="content" id="content">
+                <h1>Welcome to the Spotify OAuth app!</h1>
+                <a href="/login" class="btn">Login with Spotify</a>
+            </div>
+        <!-- Loader -->
+    <script src="{url_for('static', filename='script.js')}"></script>
+    
+    </body>
+    </html>
+    '''
+    return result
 
 @app.route('/login')
 def login():
@@ -81,7 +103,8 @@ def profile():
     # Generate HTML content for playlists
     playlists_html = '<h2>Your Playlists:</h2><ul>'
     for playlist in playlists_json.get('items', []):
-        playlists_html += f'<li>{playlist.get("name")}</li>'
+        if(playlist.get("owner").get("id") == profile_json.get("id")): #get playlist created by the user 
+            playlists_html += f'<li>{playlist.get("name")}</li>'
     playlists_html += '</ul>'
     result= f'''
     <!DOCTYPE html>
@@ -91,8 +114,13 @@ def profile():
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
     </head>
     <body>
+        <div class="loader" id="loader"></div>
+        <div class="content" id="content">
         <h1>Hello, {profile_json.get("display_name")}!</h1>
         {playlists_html}
+        </div>
+
+        <script src="{url_for('static', filename='script.js')}"></script>
     </body>
     </html>
     '''
@@ -100,4 +128,4 @@ def profile():
     return result
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

@@ -5,6 +5,10 @@ body {
     color: #333;
     text-align: center;
 }
+.content {
+    display: none; /* Hide content initially */
+  
+}
 
 h1 {
     color: #1DB954; /* Spotify green */
@@ -22,3 +26,24 @@ li {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+
+/* Loader Styles */
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #1DB954; /* Spotify green */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
