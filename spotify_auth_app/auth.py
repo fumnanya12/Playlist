@@ -114,13 +114,46 @@ def profile():
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
     </head>
     <body>
-        <div class="loader" id="loader"></div>
-        <div class="content" id="content">
-        <h1>Hello, {profile_json.get("display_name")}!</h1>
-        {playlists_html}
+        <div class="loader-container">
+            <!-- Updated Loader -->
+            <div class="loader">
+                <div class="box box0">
+                    <div></div>
+                </div>
+                <div class="box box1">
+                    <div></div>
+                </div>
+                <div class="box box2">
+                    <div></div>
+                </div>
+                <div class="box box3">
+                    <div></div>
+                </div>
+                <div class="box box4">
+                    <div></div>
+                </div>
+                <div class="box box5">
+                    <div></div>
+                </div>
+                <div class="box box6">
+                    <div></div>
+                </div>
+                <div class="box box7">
+                    <div></div>
+                </div>
+                <div class="ground">
+                        <div></div>
+                </div>
+            </div>
         </div>
 
-        <script src="{url_for('static', filename='script.js')}"></script>
+
+        <div class="content" id="content">
+            <h1>Hello, {profile_json.get("display_name")}!</h1>
+            {playlists_html}
+        </div>
+
+        <script src="{url_for('static', filename='login.js')}"></script>
     </body>
     </html>
     '''
