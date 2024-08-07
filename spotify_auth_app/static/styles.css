@@ -42,8 +42,8 @@ li {
 /* From Uiverse.io by Admin12121 */ 
 .loader {
     --duration: 3s;
-    --primary: rgba(39, 94, 254, 1);
-    --primary-light: #2f71ff;
+    --primary: rgb(23, 139, 48);
+    --primary-light: #64d588;
     --primary-rgba: rgba(39, 94, 254, 0);
     width: 200px;
     height: 320px;
@@ -66,7 +66,7 @@ li {
     right: 32%;
     bottom: -11px;
   /* change the back groung color on switching from light to dark mood */
-    background: #e8e8e8;
+    background: #ffffff;
     transform: translateZ(200px) rotate(var(--r));
     -webkit-animation: mask var(--duration) linear forwards infinite;
     animation: mask var(--duration) linear forwards infinite;
