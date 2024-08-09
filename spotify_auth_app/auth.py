@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, request, session, url_for
 import requests
 import os
+from datetime import datetime
+from db_operations import store_recent_play, get_recent_plays
 # Load environment variables fclearom .env file
 load_dotenv()
 app = Flask(__name__)
@@ -50,7 +52,7 @@ def login():
         'response_type': 'code',
         'client_id': SPOTIPY_CLIENT_ID,
         'redirect_uri': SPOTIPY_REDIRECT_URI,
-        'scope': 'user-library-read playlist-read-private playlist-read-collaborative'
+        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played'
     }
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
@@ -79,7 +81,7 @@ def callback():
 
     # Store access token in session
     session['access_token'] = access_token
-    return redirect(url_for('profile'))
+    return redirect(url_for('store_play'))
 
 @app.route('/profile')
 def profile():
@@ -159,6 +161,60 @@ def profile():
     '''
 
     return result
+
+
+
+'storing  recent plays' 
+
+@app.route('/store_play')
+def store_play():
+    access_token = session.get('access_token')
+    if not access_token:
+        return redirect(url_for('login'))
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    # Fetch the user's recently played tracks
+    recently_played_r = requests.get(
+        'https://api.spotify.com/v1/me/player/recently-played', headers=headers
+    )
+    recently_played_json = recently_played_r.json()
+           
+    # Store each play in MongoDB
+    for item in recently_played_json.get('items', []):
+        song_name = item['track']['name']
+        song_id = item['track']['id']
+        play_time = item['played_at']
+        testtime=datetime.fromisoformat(play_time.rstrip("Z"))
+       # print(song_id, song_name, testtime)
+
+        store_recent_play(song_name, song_id, datetime.fromisoformat(play_time[:-1]))
+
+    result= f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Welcome page</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
+
+    </head>
+    <body>
+    
+     <div class="container">
+            <div class="loader" id="loader"></div>
+            <div class="content" id="content">
+                <h1>Generate last recent plays</h1>
+                <a href="#" class="btn">See Plays</a>
+            </div>
+        <!-- Loader -->
+    <script src="{url_for('static', filename='script.js')}"></script>
+    
+    </body>
+    </html>
+    '''
+    return result
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
