@@ -174,20 +174,46 @@ def store_play():
 
     headers = {'Authorization': f'Bearer {access_token}'}
     # Fetch the user's recently played tracks
-    recently_played_r = requests.get(
-        'https://api.spotify.com/v1/me/player/recently-played', headers=headers
-    )
-    recently_played_json = recently_played_r.json()
-           
+   # recently_played_r = requests.get(
+ #       'https://api.spotify.com/v1/me/player/recently-played', headers=headers
+   # )
+    #recently_played_json = recently_played_r.json()
+    recently_played_tracks = []
+    limit = 50
+    total_items = 100
+    offset = 0
+    while len(recently_played_tracks) < total_items:
+        response = requests.get(
+            'https://api.spotify.com/v1/me/player/recently-played',
+            headers=headers,
+            params={'limit': limit, 'offset': offset}
+        )
+        if response.status_code != 200:
+            return f"Failed to retrieve data: {response.status_code}, {response.text}"
+
+        data = response.json()
+        items = data.get('items', [])
+        recently_played_tracks.extend(items)
+
+        if len(items) < limit:
+            # No more items available
+            break
+
+        offset += limit
+
+
+    print(len(recently_played_tracks))
+    count = 0
     # Store each play in MongoDB
-    for item in recently_played_json.get('items', []):
+    for item in recently_played_tracks:
         song_name = item['track']['name']
         song_id = item['track']['id']
         play_time = item['played_at']
         testtime=datetime.fromisoformat(play_time.rstrip("Z"))
-       # print(song_id, song_name, testtime)
+        count+=1
+        #print(song_id, song_name, testtime, "song : ",count)
 
-        store_recent_play(song_name, song_id, datetime.fromisoformat(play_time[:-1]))
+        store_recent_play(song_name, song_id, play_time)
 
     result= f'''
     <!DOCTYPE html>
