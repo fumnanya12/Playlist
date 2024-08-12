@@ -2,3 +2,9 @@
 cert.pem
 key.pem
 spotify_auth_app/__pycache__
+spotify_auth_app/flask_session
+spotify_auth_app/myenv
+.vscode/launch.json
+.cache
+spotify_auth_app/venv
+flask_session

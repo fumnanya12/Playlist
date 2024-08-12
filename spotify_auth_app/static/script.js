@@ -9,7 +9,7 @@ window.addEventListener('load', function() {
         setTimeout(function() {
             loader.style.display = 'none'; // Hide the loader
             content.style.display = 'block'; // Show the content
-        }, 1500); // Delay to see the loader for 2 seconds
+        }, 600); // Delay to see the loader for 2 seconds
     } else {
         console.error('Loader or content element not found');
     }

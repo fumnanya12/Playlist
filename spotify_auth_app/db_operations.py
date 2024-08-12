@@ -53,7 +53,8 @@ def store_recent_play(song_name, song_id, play_time):
             "play_time": play_time_only
         }
         plays_collection.insert_one(play_data)
-   
+
+        print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database")
 
 def get_recent_plays(user_id, timeframe=24):
     from datetime import datetime, timedelta
@@ -63,3 +64,25 @@ def get_recent_plays(user_id, timeframe=24):
         "play_time": {"$gte": time_threshold}
     })
     return list(recent_plays)
+
+def get_all_recent_plays():
+    """
+    Fetches all recent plays from the database.
+    
+    Returns:
+    - List[dict]: A list of dictionaries containing song information.
+    """
+    # Query the collection to get all plays, sorted by play_date and play_time
+    recent_plays = plays_collection.find().sort(
+        [("play_date", pymongo.DESCENDING), ("play_time", pymongo.DESCENDING)]
+    )
+    # Prepare the output list
+    plays_list = []
+    
+    # Iterate through the results and structure them as required
+    for play in recent_plays:
+        song_details= "song_name: " + play.get("song_name") + " play_date: " + play.get("play_date") + " play_time: " + play.get("play_time")
+        plays_list.append(song_details)
+    
+    # Convert the cursor to a list of dictionaries
+    return plays_list

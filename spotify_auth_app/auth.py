@@ -3,7 +3,7 @@ from flask import Flask, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime
-from db_operations import store_recent_play, get_recent_plays
+from db_operations import store_recent_play, get_all_recent_plays
 # Load environment variables fclearom .env file
 load_dotenv()
 app = Flask(__name__)
@@ -180,7 +180,7 @@ def store_play():
     #recently_played_json = recently_played_r.json()
     recently_played_tracks = []
     limit = 50
-    total_items = 100
+    total_items = 50
     offset = 0
     while len(recently_played_tracks) < total_items:
         response = requests.get(
@@ -229,7 +229,7 @@ def store_play():
             <div class="loader" id="loader"></div>
             <div class="content" id="content">
                 <h1>Generate last recent plays</h1>
-                <a href="#" class="btn">See Plays</a>
+                <a href="/recent_plays" class="btn">See Plays</a>
             </div>
         <!-- Loader -->
     <script src="{url_for('static', filename='script.js')}"></script>
@@ -239,7 +239,75 @@ def store_play():
     '''
     return result
 
+@app.route('/recent_plays')
+def recent_plays():
+    access_token = session.get('access_token')
+    #print("The access_token is",access_token);
+    # print(session)
+    if not access_token:
+        return redirect(url_for('login'))
+    # Fetch user profile information
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    recent_plays=get_all_recent_plays()
+    playlists_html = '<h2>Your Playlists:</h2><ul>'
+    for playlist in recent_plays:
+        playlists_html += f'<li>{playlist}</li>'
+    playlists_html += '</ul>'
+    result= f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Spotify Profile</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
+    </head>
+    <body>
+        <div class="loader-container">
+            <!-- Updated Loader -->
+            <div class="loader">
+                <div class="box box0">
+                    <div></div>
+                </div>
+                <div class="box box1">
+                    <div></div>
+                </div>
+                <div class="box box2">
+                    <div></div>
+                </div>
+                <div class="box box3">
+                    <div></div>
+                </div>
+                <div class="box box4">
+                    <div></div>
+                </div>
+                <div class="box box5">
+                    <div></div>
+                </div>
+                <div class="box box6">
+                    <div></div>
+                </div>
+                <div class="box box7">
+                    <div></div>
+                </div>
+                <div class="ground">
+                        <div></div>
+                </div>
+            </div>
+        </div>
 
+
+        <div class="content" id="content">
+            <h1>Hello, {profile_json.get("display_name")}!</h1>
+            {playlists_html}
+        </div>
+
+        <script src="{url_for('static', filename='login.js')}"></script>
+    </body>
+    </html>
+    '''
+
+    return result
 
 
 if __name__ == '__main__':
