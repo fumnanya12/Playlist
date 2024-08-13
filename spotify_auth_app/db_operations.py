@@ -21,16 +21,14 @@ test_data = {
     "song_id": "test_song",
     "play_time": "2024-08-08T12:00:00Z"
 }
-
 #result = plays_collection.insert_one(test_data)
 #print(f"Inserted document ID: {result.inserted_id}")
-def store_recent_play(song_name, song_id, play_time):
+def store_recent_play(song_name, song_id, play_time, count):
     # Convert play_time to a datetime object
     play_time_obj = datetime.fromisoformat(play_time[:-1])  
 
      # Convert to UTC
     play_time_utc = pytz.utc.localize(play_time_obj)
-    
     # Convert UTC to Winnipeg time
     play_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
     # Separate date and time
@@ -53,9 +51,9 @@ def store_recent_play(song_name, song_id, play_time):
             "play_time": play_time_only
         }
         plays_collection.insert_one(play_data)
-
+        count+=1
         print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database")
-
+        print("song count: ",count)
 def get_recent_plays(user_id, timeframe=24):
     from datetime import datetime, timedelta
     time_threshold = datetime.utcnow() - timedelta(hours=timeframe)

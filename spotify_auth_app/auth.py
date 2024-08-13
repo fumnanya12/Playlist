@@ -4,6 +4,9 @@ import requests
 import os
 from datetime import datetime
 from db_operations import store_recent_play, get_all_recent_plays
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
 # Load environment variables fclearom .env file
 load_dotenv()
 app = Flask(__name__)
@@ -19,12 +22,17 @@ SPOTIPY_REDIRECT_URI = 'http://localhost:5000/callback'
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
+
+# Global variable to store access token
+global_access_token = None
+scheduler = BackgroundScheduler()
+
 @app.route('/')
 def index():
     result= f'''
     <!DOCTYPE html>
     <html>
-    <head>
+    <head>s
         <title>Welcome page</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
 
@@ -59,6 +67,8 @@ def login():
 
 @app.route('/callback')
 def callback():
+    global global_access_token
+
     code = request.args.get('code')
     if not code:
         return 'Authorization failed.'
@@ -79,12 +89,22 @@ def callback():
     if not access_token:
         return 'Failed to retrieve access token.'
 
+    
     # Store access token in session
     session['access_token'] = access_token
+
+    # Store access token in a global variable
+    global_access_token = access_token
+
+    # Start the scheduler after obtaining the access token
+    if not scheduler.running:
+        scheduler.add_job(store_play_job, 'interval', minutes=15)
+        scheduler.start()
     return redirect(url_for('store_play'))
 
 @app.route('/profile')
 def profile():
+
     access_token = session.get('access_token')
     #print("The access_token is",access_token);
     # print(session)
@@ -162,22 +182,20 @@ def profile():
 
     return result
 
+def  store_play_job():
+    global global_access_token
 
+    if not global_access_token:
+        print("Access token not available.")
+        return redirect(url_for('login'))
 
-'storing  recent plays' 
-
-@app.route('/store_play')
-def store_play():
-    access_token = session.get('access_token')
+    headers = {'Authorization': f'Bearer {global_access_token}'}
+    ''' access_token = session.get('access_token')
     if not access_token:
         return redirect(url_for('login'))
 
     headers = {'Authorization': f'Bearer {access_token}'}
-    # Fetch the user's recently played tracks
-   # recently_played_r = requests.get(
- #       'https://api.spotify.com/v1/me/player/recently-played', headers=headers
-   # )
-    #recently_played_json = recently_played_r.json()
+    '''
     recently_played_tracks = []
     limit = 50
     total_items = 50
@@ -209,12 +227,17 @@ def store_play():
         song_name = item['track']['name']
         song_id = item['track']['id']
         play_time = item['played_at']
-        testtime=datetime.fromisoformat(play_time.rstrip("Z"))
-        count+=1
-        #print(song_id, song_name, testtime, "song : ",count)
+        store_recent_play(song_name, song_id, play_time,count)
+    print("Recent plays stored successfully.")
 
-        store_recent_play(song_name, song_id, play_time)
 
+
+'storing  recent plays' 
+
+@app.route('/store_play')
+def store_play():
+
+    store_play_job()
     result= f'''
     <!DOCTYPE html>
     <html>
