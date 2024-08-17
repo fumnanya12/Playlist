@@ -79,7 +79,22 @@ def get_all_recent_plays():
     
     # Iterate through the results and structure them as required
     for play in recent_plays:
-        song_details= "song_name: " + play.get("song_name") + " play_date: " + play.get("play_date") + " play_time: " + play.get("play_time")
+         # Attempt to parse play_date and play_time
+        try:
+            # Assuming play_date is in 'YYYY-MM-DD' format and play_time in 'HH:MM:SS.ssssss'
+            if 'play_date' in play and 'play_time' in play:
+                date_part = datetime.strptime(play['play_date'], "%Y-%m-%d")
+                time_part = datetime.strptime(play['play_time'].split('.')[0], "%H:%M:%S")  # Ignore milliseconds
+
+                formatted_date = date_part.strftime("%m/%d/%Y")
+                formatted_time = time_part.strftime("%I:%M %p")
+            else:
+                formatted_date = "Unknown Date"
+                formatted_time = "Unknown Time"
+        except ValueError:
+            formatted_date = "Invalid Date"
+            formatted_time = "Invalid Time"
+        song_details=  f"song_name: {play.get('song_name')} Played_date: {formatted_date},   Played_time: {formatted_time}"
         plays_list.append(song_details)
     
     # Convert the cursor to a list of dictionaries

@@ -27,7 +27,7 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 global_access_token = None
 scheduler = BackgroundScheduler()
 
-@app.route('/index')
+@app.route('/')
 def index():
     result= f'''
     <!DOCTYPE html>
