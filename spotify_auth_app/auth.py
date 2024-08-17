@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask, redirect, request, session, url_for
+from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime
@@ -27,7 +27,7 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 global_access_token = None
 scheduler = BackgroundScheduler()
 
-@app.route('/')
+@app.route('/index')
 def index():
     result= f'''
     <!DOCTYPE html>
@@ -65,6 +65,17 @@ def login():
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
 
+@app.route('/logout')
+def logout():
+    # Clear the session
+    session.clear()
+
+    # Optionally, add a logout message
+    print('You have been logged out.', 'info')
+
+    # Redirect to the login page or home page
+    return redirect(url_for('index'))
+
 @app.route('/callback')
 def callback():
     global global_access_token
@@ -98,9 +109,9 @@ def callback():
 
     # Start the scheduler after obtaining the access token
     if not scheduler.running:
-        scheduler.add_job(store_play_job, 'interval', minutes=15)
+        scheduler.add_job(store_play_job, 'interval', minutes=25)
         scheduler.start()
-    return redirect(url_for('store_play'))
+    return redirect(url_for('welcome'))
 
 @app.route('/profile')
 def profile():
@@ -182,6 +193,63 @@ def profile():
 
     return result
 
+
+
+"Welcome Page"
+@app.route('/welcome')
+def welcome():
+    access_token = session.get('access_token')
+    if not access_token:
+        return redirect(url_for('login'))
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    result= f'''
+            <!DOCTYPE html>
+        <html lang="en" dir="ltr">
+        <head>
+        <meta charset="UTF-8">
+        <title> Welcome page | Spotify activity   </title> 
+            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
+        </head>
+        <body>
+        <div class="container">  
+         <h1>Hello, {profile_json.get("display_name")}!</h1>
+        <a href="/logout">
+        <button> <span>Logout</span>
+        </button> </a>
+        <ul class="nav-links">
+            <li><a href="#">Profile</a></li>
+            <li class="center"><a href="/profile">Playlists</a></li>
+            <li class="upward"><a href="/recent_plays">Recently played</a></li>
+            <li class="forward"><a href="/store_play">Statistics</a></li>
+        </ul>
+        </div>
+
+
+       
+        </body>
+        </html>
+    '''
+    return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'storing  recent plays' 
+
+
 def  store_play_job():
     global global_access_token
 
@@ -228,11 +296,11 @@ def  store_play_job():
         song_id = item['track']['id']
         play_time = item['played_at']
         store_recent_play(song_name, song_id, play_time,count)
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
     print("Recent plays stored successfully.")
-
-
-
-'storing  recent plays' 
 
 @app.route('/store_play')
 def store_play():
