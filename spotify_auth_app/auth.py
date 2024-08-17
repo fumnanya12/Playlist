@@ -387,10 +387,13 @@ def recent_plays():
             </div>
         </div>
 
-
+        
         <div class="content" id="content">
             <h1>Hello, {profile_json.get("display_name")}!</h1>
             {playlists_html}
+            <a href="/welcome">
+            <button> <span>Back</span>
+            </button> </a>
         </div>
 
         <script src="{url_for('static', filename='login.js')}"></script>
