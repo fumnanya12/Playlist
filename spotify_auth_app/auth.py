@@ -311,17 +311,26 @@ def store_play():
     <html>
     <head>
         <title>Welcome page</title>
-        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='stats.css')}">
 
     </head>
     <body>
     
-     <div class="container">
+      <div class="container">
             <div class="loader" id="loader"></div>
             <div class="content" id="content">
-                <h1>Generate last recent plays</h1>
-                <a href="/recent_plays" class="btn">See Plays</a>
+                <nav class="navbar">
+                    <div class="logo">
+                        <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
+                    </div>
+                    <ul class="nav-links">
+                        <li><a href="/top_tracks">Top Tracks</a></li>
+                        <li><a href="/top_artists">Top Artists</a></li>
+                        <li><a href="/recent_plays">Recently Played</a></li>
+                    </ul>
+                </nav>
             </div>
+        </div>
         <!-- Loader -->
     <script src="{url_for('static', filename='script.js')}"></script>
     

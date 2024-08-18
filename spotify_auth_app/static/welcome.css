@@ -1,111 +1,110 @@
 /* welcome.css */
 body {
-    font-family: Arial, sans-serif;
-    color: #333;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  color: #333;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #f4f4f4;
 }
 
 .container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    --s: 82px;
-    --c1: #b2b2b2;
-    --c2: #ffffff;
-    --c3: #d9d9d9;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --s: 82px;
+  --c1: #b2b2b2;
+  --c2: #ffffff;
+  --c3: #d9d9d9;
 
-    --_g: var(--c3) 0 120deg, #0000 0;
-    background: conic-gradient(from -60deg at 50% calc(100% / 3), var(--_g)),
-        conic-gradient(from 120deg at 50% calc(200% / 3), var(--_g)),
-        conic-gradient(
-        from 60deg at calc(200% / 3),
-        var(--c3) 60deg,
-        var(--c2) 0 120deg,
-        #0000 0
-        ),
-        conic-gradient(from 180deg at calc(100% / 3), var(--c1) 60deg, var(--_g)),
-        linear-gradient(
-        90deg,
-        var(--c1) calc(100% / 6),
-        var(--c2) 0 50%,
-        var(--c1) 0 calc(500% / 6),
-        var(--c2) 0
-        );
-    background-size: calc(1.732 * var(--s)) var(--s);
+  --_g: var(--c3) 0 120deg, #0000 0;
+  background: conic-gradient(from -60deg at 50% calc(100% / 3), var(--_g)),
+      conic-gradient(from 120deg at 50% calc(200% / 3), var(--_g)),
+      conic-gradient(
+      from 60deg at calc(200% / 3),
+      var(--c3) 60deg,
+      var(--c2) 0 120deg,
+      #0000 0
+      ),
+      conic-gradient(from 180deg at calc(100% / 3), var(--c1) 60deg, var(--_g)),
+      linear-gradient(
+      90deg,
+      var(--c1) calc(100% / 6),
+      var(--c2) 0 50%,
+      var(--c1) 0 calc(500% / 6),
+      var(--c2) 0
+      );
+  background-size: calc(1.732 * var(--s)) var(--s);
 }
 h1 {
-    color: #083518; /* Spotify green */
+  color: #083518; /* Spotify green */
 }
 
 /* button*/
 /* From Uiverse.io by elijahgummer */ 
 .btn {
-    font: inherit;
-    background-color: #1DB954; /* Spotify green */    
-    border: 0;
-    color: #242424;
-    border-radius: 0.5em;
-    font-size: 1.35rem;
-    padding: 0.375em 1em;
-    font-weight: 600;
-    text-shadow: 0 0.0625em 0 #fff;
-    box-shadow: inset 0 0.0625em 0 0 #298f4d, 0 0.0625em 0 0 #6dbd89,
-      0 0.125em 0 0 #57b879, 0 0.25em 0 0 #2ca456, 0 0.3125em 0 0 #33b561,
-      0 0.375em 0 0 #66ae7f, 0 0.425em 0 0 #64cd89, 0 0.425em 0.5em 0 #4aaa6b;
-    transition: 0.15s ease;
-    cursor: pointer;
-    text-decoration: none
-  }
-
-  .btn:hover {
-    background-color: #1aa34a; /* Darker green on hover */
+  font: inherit;
+  background-color: #1DB954; /* Spotify green */    
+  border: 0;
+  color: #242424;
+  border-radius: 0.5em;
+  font-size: 1.35rem;
+  padding: 0.375em 1em;
+  font-weight: 600;
+  text-shadow: 0 0.0625em 0 #fff;
+  box-shadow: inset 0 0.0625em 0 0 #298f4d, 0 0.0625em 0 0 #6dbd89,
+    0 0.125em 0 0 #57b879, 0 0.25em 0 0 #2ca456, 0 0.3125em 0 0 #33b561,
+    0 0.375em 0 0 #66ae7f, 0 0.425em 0 0 #64cd89, 0 0.425em 0.5em 0 #4aaa6b;
+  transition: 0.15s ease;
+  cursor: pointer;
+  text-decoration: none
 }
-  .btn:active {
-    translate: 0 0.225em;
-    box-shadow: inset 0 0.0625em 0 0 #298f4d, 0 0.0625em 0 0 #6dbd89,
-      0 0.125em 0 0 #57b879, 0 0.25em 0 0 #2ca456, 0 0.3125em 0 0 #33b561,
-      0 0.375em 0 0 #66ae7f, 0 0.425em 0 0 #64cd89, 0 0.425em 0.5em 0 #4aaa6b;
-      text-decoration: none; /* Ensure no underline on active */
 
-  }
- 
-  
+.btn:hover {
+  background-color: #1aa34a; /* Darker green on hover */
+}
+.btn:active {
+  translate: 0 0.225em;
+  box-shadow: inset 0 0.0625em 0 0 #298f4d, 0 0.0625em 0 0 #6dbd89,
+    0 0.125em 0 0 #57b879, 0 0.25em 0 0 #2ca456, 0 0.3125em 0 0 #33b561,
+    0 0.375em 0 0 #66ae7f, 0 0.425em 0 0 #64cd89, 0 0.425em 0.5em 0 #4aaa6b;
+    text-decoration: none; /* Ensure no underline on active */
+
+}
+
+
 .content {
-    display: none; /* Hide content initially */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2; /* Ensure content is above the loader */
-    text-align: center;
+  display: none; /* Hide content initially */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; /* Ensure content is above the loader */
+  text-align: center;
 }
 
 
 /* Loader Styles */
 .loader {
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #1DB954; /* Spotify green */
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #1DB954; /* Spotify green */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
