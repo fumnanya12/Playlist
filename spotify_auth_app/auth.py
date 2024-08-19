@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from db_operations import store_recent_play, get_all_recent_plays
 from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
 
 
 # Load environment variables fclearom .env file
@@ -113,27 +114,61 @@ def callback():
         scheduler.start()
     return redirect(url_for('welcome'))
 
+"Welcome Page"
+@app.route('/welcome')
+def welcome():
+    access_token = session.get('access_token')
+    if not access_token:
+        return redirect(url_for('login'))
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    result= f'''
+            <!DOCTYPE html>
+        <html lang="en" dir="ltr">
+        <head>
+        <meta charset="UTF-8">
+        <title> Welcome page | Spotify activity   </title> 
+            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
+        </head>
+        <body>
+        <div class="container">  
+         <h1>Hello, {profile_json.get("display_name")}!</h1>
+        <a href="/logout">
+        <button> <span>Logout</span>
+        </button> </a>
+        <ul class="nav-links">
+            <li><a href="#">Profile</a></li>
+            <li class="center"><a href="/profile">Playlists</a></li>
+            <li class="upward"><a href="/recently_played">Recently played</a></li>
+            <li class="forward"><a href="/store_play">Statistics</a></li>
+        </ul>
+        </div>
+
+
+       
+        </body>
+        </html>
+    '''
+    return result
+
+
+
 @app.route('/profile')
 def profile():
 
     access_token = session.get('access_token')
-    #print("The access_token is",access_token);
-    # print(session)
+ 
     if not access_token:
         return redirect(url_for('login'))
     # Fetch user profile information
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
-   # print(profile_json)
     # Fetch user playlists
     playlists_r = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers)
     playlists_json = playlists_r.json()
-    # test= playlists_json.get('items', [])
-    # for testlist in test:
-    #     ownerlist= testlist.get("owner")
-    #     print(ownerlist)
-    # Generate HTML content for playlists
+   
     playlists_html = '<h2>Your Playlists:</h2><ul>'
     for playlist in playlists_json.get('items', []):
         if(playlist.get("owner").get("id") == profile_json.get("id")): #get playlist created by the user 
@@ -184,6 +219,9 @@ def profile():
         <div class="content" id="content">
             <h1>Hello, {profile_json.get("display_name")}!</h1>
             {playlists_html}
+              <a href="/welcome">
+            <button> <span>Back</span>
+            </button> </a>
         </div>
 
         <script src="{url_for('static', filename='login.js')}"></script>
@@ -194,57 +232,119 @@ def profile():
     return result
 
 
+"Recently played song "
+@app.route('/recently_played')
+def recently_played():
 
-"Welcome Page"
-@app.route('/welcome')
-def welcome():
     access_token = session.get('access_token')
+ 
     if not access_token:
         return redirect(url_for('login'))
+    # Fetch user profile information
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
+    # Fetch user playlists
+    
+    recently_played_tracks = []
+    limit = 50
+    total_items = 50
+    offset = 0
+    while len(recently_played_tracks) < total_items:
+        response = requests.get(
+            'https://api.spotify.com/v1/me/player/recently-played',
+            headers=headers,
+            params={'limit': limit, 'offset': offset}
+        )
+        if response.status_code != 200:
+            return f"Failed to retrieve data: {response.status_code}, {response.text}"
+
+        data = response.json()
+        items = data.get('items', [])
+        recently_played_tracks.extend(items)
+
+        if len(items) < limit:
+            # No more items available
+            break
+
+        offset += limit
+ 
+    playlists_html = '<h2> Replay: The Last 50:</h2><ul>'
+    for playlist in recently_played_tracks :
+        song_name = playlist['track']['name']
+        song_artist = playlist['track']['artists'][0]['name']
+        play_time = playlist['played_at']
+        # Convert play_time to a datetime object
+        play_time_obj = datetime.fromisoformat(play_time[:-1])  
+
+        # Convert to UTC
+        play_time_utc = pytz.utc.localize(play_time_obj)
+        # Convert UTC to Winnipeg time
+        play_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
+        # Separate date and time
+        formatted_date = play_time_winnipeg.date().strftime("%m/%d/%Y")
+        formatted_time = play_time_winnipeg.time().strftime("%I:%M %p")
+        
+        song_result= f"Song Name: {song_name} by {song_artist} on {formatted_date} at {formatted_time}"
+
+        playlists_html += f'<li>{song_result}</li>'
+    playlists_html += '</ul>'
     result= f'''
-            <!DOCTYPE html>
-        <html lang="en" dir="ltr">
-        <head>
-        <meta charset="UTF-8">
-        <title> Welcome page | Spotify activity   </title> 
-            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
-        </head>
-        <body>
-        <div class="container">  
-         <h1>Hello, {profile_json.get("display_name")}!</h1>
-        <a href="/logout">
-        <button> <span>Logout</span>
-        </button> </a>
-        <ul class="nav-links">
-            <li><a href="#">Profile</a></li>
-            <li class="center"><a href="/profile">Playlists</a></li>
-            <li class="upward"><a href="/recent_plays">Recently played</a></li>
-            <li class="forward"><a href="/store_play">Statistics</a></li>
-        </ul>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Spotify Profile</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
+    </head>
+    <body>
+        <div class="loader-container">
+            <!-- Updated Loader -->
+            <div class="loader">
+                <div class="box box0">
+                    <div></div>
+                </div>
+                <div class="box box1">
+                    <div></div>
+                </div>
+                <div class="box box2">
+                    <div></div>
+                </div>
+                <div class="box box3">
+                    <div></div>
+                </div>
+                <div class="box box4">
+                    <div></div>
+                </div>
+                <div class="box box5">
+                    <div></div>
+                </div>
+                <div class="box box6">
+                    <div></div>
+                </div>
+                <div class="box box7">
+                    <div></div>
+                </div>
+                <div class="ground">
+                        <div></div>
+                </div>
+            </div>
         </div>
 
 
-       
-        </body>
-        </html>
+        <div class="content" id="content">
+            <h1>Hello, {profile_json.get("display_name")}!</h1>
+            {playlists_html}
+              <a href="/welcome">
+            <button> <span>Back</span>
+            </button> </a>
+        </div>
+
+        <script src="{url_for('static', filename='login.js')}"></script>
+    </body>
+    </html>
     '''
+
     return result
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 'storing  recent plays' 
@@ -258,12 +358,7 @@ def  store_play_job():
         return redirect(url_for('login'))
 
     headers = {'Authorization': f'Bearer {global_access_token}'}
-    ''' access_token = session.get('access_token')
-    if not access_token:
-        return redirect(url_for('login'))
 
-    headers = {'Authorization': f'Bearer {access_token}'}
-    '''
     recently_played_tracks = []
     limit = 50
     total_items = 50
@@ -323,6 +418,9 @@ def store_play():
                     <div class="logo">
                         <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
                     </div>
+                    <a href="/welcome">
+                    <button> <span>Back</span>
+                    </button> </a>
                     <ul class="nav-links">
                         <li><a href="/top_tracks">Top Tracks</a></li>
                         <li><a href="/top_artists">Top Artists</a></li>
