@@ -56,6 +56,9 @@ The primary goal of this project is to analyze the user's listening patterns and
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
+## Important note
+The Goal of the app is to run continuously while actively collecting the user listen and to create a montly playlist update based on the user activity.
+The project is still on going and will be updated frequently from time to time.
 ## Acknowledgements
 - Spotify API for providing the music data.
 - Flask documentation for guidance on building web applications.
