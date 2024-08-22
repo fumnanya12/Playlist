@@ -43,7 +43,7 @@ body {
   background-size: calc(1.732 * var(--s)) var(--s);
 }
 h1 {
-  color: #083518; /* Spotify green */
+  color: #000000; /* Spotify green */
 }
 
 /* button*/

@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
-from datetime import datetime
+from datetime import datetime,timedelta
 from db_operations import store_recent_play, get_all_recent_plays
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
@@ -24,9 +24,47 @@ AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 
+# scheduler
+scheduler = BackgroundScheduler()
+
 # Global variable to store access token
 global_access_token = None
-scheduler = BackgroundScheduler()
+# Global variables to store token data
+global_access_token = None
+global_refresh_token = None
+token_expiry = None
+
+def save_tokens(access_token, refresh_token, expires_in):
+    global global_access_token, global_refresh_token, token_expiry
+    global_access_token = access_token
+    global_refresh_token = refresh_token
+    token_expiry = datetime.utcnow() + timedelta(seconds=expires_in)
+
+def refresh_access_token():
+    global global_refresh_token, global_access_token, token_expiry
+    payload = {
+        'grant_type': 'refresh_token',
+        'refresh_token': global_refresh_token,
+        'client_id': SPOTIPY_CLIENT_ID,
+        'client_secret': SPOTIPY_CLIENT_SECRET
+    }
+    response = requests.post(TOKEN_URL, data=payload)
+    refreshed_tokens = response.json()
+    access_token = refreshed_tokens.get('access_token')
+    expires_in = refreshed_tokens.get('expires_in')
+    new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
+
+    save_tokens(access_token, new_refresh_token, expires_in)
+    return access_token
+
+def get_access_token():
+    if token_expiry is None:
+        print("no token")
+    else:
+        if datetime.utcnow() >= token_expiry:
+            return refresh_access_token()
+    return global_access_token
+
 
 @app.route('/')
 def index():
@@ -43,7 +81,7 @@ def index():
      <div class="container">
             <div class="loader" id="loader"></div>
             <div class="content" id="content">
-                <h1>Welcome to the Spotify OAuth app!</h1>
+                <h1>Welcome to the Spotify Stats app!</h1>
                 <a href="/login" class="btn">Login with Spotify</a>
             </div>
         <!-- Loader -->
@@ -93,15 +131,19 @@ def callback():
         'client_id': SPOTIPY_CLIENT_ID,
         'client_secret': SPOTIPY_CLIENT_SECRET
     }
-    token_r = requests.post(TOKEN_URL, data=token_data)
-    token_json = token_r.json()
-    print(token_json)
-    access_token = token_json.get('access_token')
+    token_response = requests.post(TOKEN_URL, data=token_data)
+    token_info = token_response.json()
+    access_token = token_info.get('access_token')
+    refresh_token = token_info.get('refresh_token')
+    expires_in = token_info.get('expires_in')
+    print(token_info)
 
     if not access_token:
-        return 'Failed to retrieve access token.'
+        print('Failed to retrieve access token.')
+        return redirect(url_for('login'))
 
-    
+
+    save_tokens(access_token, refresh_token, expires_in)
     # Store access token in session
     session['access_token'] = access_token
 
@@ -109,15 +151,16 @@ def callback():
     global_access_token = access_token
 
     # Start the scheduler after obtaining the access token
-    if not scheduler.running:
-        scheduler.add_job(store_play_job, 'interval', minutes=25)
-        scheduler.start()
+   
+    scheduler.add_job(store_play_job, 'interval', minutes=25)
+    scheduler.start()
     return redirect(url_for('welcome'))
 
 "Welcome Page"
 @app.route('/welcome')
 def welcome():
-    access_token = session.get('access_token')
+    access_token = get_access_token()
+    print(access_token)
     if not access_token:
         return redirect(url_for('login'))
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -157,8 +200,9 @@ def welcome():
 @app.route('/profile')
 def profile():
 
-    access_token = session.get('access_token')
- 
+    access_token = get_access_token()
+    print(access_token)
+
     if not access_token:
         return redirect(url_for('login'))
     # Fetch user profile information
@@ -235,8 +279,9 @@ def profile():
 "Recently played song "
 @app.route('/recently_played')
 def recently_played():
+    print(access_token)
 
-    access_token = session.get('access_token')
+    access_token = get_access_token()
  
     if not access_token:
         return redirect(url_for('login'))
@@ -351,13 +396,13 @@ def recently_played():
 
 
 def  store_play_job():
-    global global_access_token
-
-    if not global_access_token:
-        print("Access token not available.")
+    access_token = get_access_token()
+    print(access_token)
+    
+    if not access_token:
         return redirect(url_for('login'))
 
-    headers = {'Authorization': f'Bearer {global_access_token}'}
+    headers = {'Authorization': f'Bearer {access_token}'}
 
     recently_played_tracks = []
     limit = 50
@@ -439,7 +484,9 @@ def store_play():
 
 @app.route('/recent_plays')
 def recent_plays():
-    access_token = session.get('access_token')
+    print(access_token)
+
+    access_token = get_access_token()
     #print("The access_token is",access_token);
     # print(session)
     if not access_token:
@@ -449,7 +496,7 @@ def recent_plays():
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
     recent_plays=get_all_recent_plays()
-    playlists_html = '<h2>Your Playlists:</h2><ul>'
+    playlists_html = '<h2>Your Song History:</h2><ul>'
     for playlist in recent_plays:
         playlists_html += f'<li>{playlist}</li>'
     playlists_html += '</ul>'
@@ -498,7 +545,7 @@ def recent_plays():
         <div class="content" id="content">
             <h1>Hello, {profile_json.get("display_name")}!</h1>
             {playlists_html}
-            <a href="/welcome">
+            <a href="/store_play">
             <button> <span>Back</span>
             </button> </a>
         </div>
