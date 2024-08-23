@@ -1,1 +1,1 @@
-web: gunicorn auth:app
+web: gunicorn spotify_auth_app.auth:app
