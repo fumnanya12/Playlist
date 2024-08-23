@@ -1,1 +1,1 @@
-web: gunicorn spotify_auth_app.auth:app
+waitress-serve --port=8000 app:spotify_auth_app.auth
