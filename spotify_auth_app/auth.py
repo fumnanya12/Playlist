@@ -15,8 +15,8 @@ app.secret_key = os.urandom(24)
 
 
 # Replace these with your own Spotify credentials
-SPOTIPY_CLIENT_ID = os.getenv('API_ID')
-SPOTIPY_CLIENT_SECRET = os.getenv('API_KEY')
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
 
 # Spotify authorization URL
