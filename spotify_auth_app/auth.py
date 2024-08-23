@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays
+from db_operations import store_recent_play, get_all_recent_plays
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 
