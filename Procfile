@@ -1,1 +1,1 @@
-web: waitress-serve --port=$PORT auth:app
+web: waitress-serve --port=$PORT spotify_auth_app.auth:app
