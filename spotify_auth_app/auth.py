@@ -17,7 +17,7 @@ app.secret_key = os.urandom(24)
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
+SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/'
 
 # Spotify authorization URL
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -70,8 +70,10 @@ def get_access_token():
 def index():
     result= f'''
     <!DOCTYPE html>
-    <html>
-    <head>s
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
         <title>Welcome page</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
 
@@ -167,26 +169,27 @@ def welcome():
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
     result= f'''
-            <!DOCTYPE html>
+        <!DOCTYPE html>
         <html lang="en" dir="ltr">
         <head>
-        <meta charset="UTF-8">
-        <title> Welcome page | Spotify activity   </title> 
-            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+            <title> Welcome page | Spotify activity   </title> 
+                <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
         </head>
         <body>
-        <div class="container">  
-         <h1>Hello, {profile_json.get("display_name")}!</h1>
-        <a href="/logout">
-        <button> <span>Logout</span>
-        </button> </a>
-        <ul class="nav-links">
-            <li><a href="#">Profile</a></li>
-            <li class="center"><a href="/profile">Playlists</a></li>
-            <li class="upward"><a href="/recently_played">Recently played</a></li>
-            <li class="forward"><a href="/store_play">Statistics</a></li>
-        </ul>
-        </div>
+            <div class="container">  
+            <h1>Hello, {profile_json.get("display_name")}!</h1>
+            <a href="/logout">
+            <button> <span>Logout</span>
+            </button> </a>
+            <ul class="nav-links">
+                <li><a href="#">Profile</a></li>
+                <li class="center"><a href="/profile">Playlists</a></li>
+                <li class="upward"><a href="/recently_played">Recently played</a></li>
+                <li class="forward"><a href="/store_play">Statistics</a></li>
+            </ul>
+            </div>
 
 
        
@@ -220,8 +223,10 @@ def profile():
     playlists_html += '</ul>'
     result= f'''
     <!DOCTYPE html>
-    <html>
+    <html lang="en" dir="ltr">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>Spotify Profile</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
     </head>
@@ -336,8 +341,10 @@ def recently_played():
     playlists_html += '</ul>'
     result= f'''
     <!DOCTYPE html>
-    <html>
+    <html lang="en" dir="ltr">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>Spotify Profile</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='styles.css')}">
     </head>
@@ -454,11 +461,13 @@ def  store_play_job():
 @app.route('/store_play')
 def store_play():
 
-    #store_play_job()
+    
     result= f'''
     <!DOCTYPE html>
-    <html>
+    <html lang="en" dir="ltr">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>Welcome page</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='stats.css')}">
 
@@ -478,7 +487,7 @@ def store_play():
                     <ul class="nav-links">
                         <li><a href="/top_tracks">Top Tracks</a></li>
                         <li><a href="/top_artists">Top Artists</a></li>
-                        <li><a href="/recent_plays">Recently Played</a></li>
+                        <li><a href="/recent_plays">Listening activity</a></li>
                     </ul>
                 </nav>
             </div>
@@ -557,8 +566,10 @@ def top_artists():
 
     result= f'''
         <!DOCTYPE html>
-        <html>
+        <html lang="en" dir="ltr">
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
             <title>Welcome page</title>
             <link rel="stylesheet" type="text/css" href="{url_for('static', filename='toptrack.css')}">
 
@@ -579,7 +590,7 @@ def top_artists():
                             <ul class="nav-links">
                                 <li><a href="/top_tracks">Top Tracks</a></li>
                                 <li><a href="/top_artists">Top Artists</a></li>
-                                <li><a href="/recent_plays">Recently Played</a></li>
+                                <li><a href="/recent_plays">Listening activity</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -677,8 +688,10 @@ def top_tracks():
 
     result= f'''
         <!DOCTYPE html>
-        <html>
+        <html lang="en" dir="ltr">
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
             <title>Welcome page</title>
             <link rel="stylesheet" type="text/css" href="{url_for('static', filename='toptrack.css')}">
 
@@ -699,7 +712,7 @@ def top_tracks():
                             <ul class="nav-links">
                                 <li><a href="/top_tracks">Top Tracks</a></li>
                                 <li><a href="/top_artists">Top Artists</a></li>
-                                <li><a href="/recent_plays">Recently Played</a></li>
+                                <li><a href="/recent_plays">Listening activity</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -735,6 +748,7 @@ def top_tracks():
 
 @app.route('/recent_plays')
 def recent_plays():
+    #store_play_job()
     access_token = get_access_token()
     #print("The access_token is",access_token);
     # print(session)

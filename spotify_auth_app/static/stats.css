@@ -164,3 +164,48 @@ button {
     transform: translate3d(100%, 0, 0);
    }
    
+   /* Mobile styles */
+   /* Responsive Styles */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 5px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .logo {
+        margin-right: 10px;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+    .nav-links {
+        flex-direction: row;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .nav-links li {
+        margin: 5px 5px;
+    }
+
+    .nav-links li a {
+        font-size: 14px;
+    }
+
+    .loader {
+        width: 40px;
+        height: 40px;
+    }
+
+    button {
+        top: 5px;
+        right: 10px;
+        padding: 0.7rem 1.5rem;
+        font-size: 10px;
+    }
+}

@@ -884,3 +884,38 @@ button {
     }
   }
   
+ 
+   /* Mobile responsive */
+   /* Responsive Styles */
+@media (max-width: 600px) {
+  ul {
+      padding: 0 10px;
+  }
+
+  li {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+  h1 {
+    font-size: 22px;
+    top: 30px;
+}
+  button {
+      top: 20px;
+      left: 10px;
+      padding: 0.7rem 1.5rem;
+      font-size: 10px;
+  }
+
+  .loader {
+      width: 100px;
+      height: 160px;
+  }
+
+  
+}

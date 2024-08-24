@@ -108,3 +108,34 @@ h1 {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Responsive Styles */
+@media (max-width: 700px) {
+  body {
+    flex-direction: column;
+    justify-content: flex-start;
+    
+  }
+
+  .container {
+    flex-direction: column;
+    justify-content: flex-start;
+    
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px 10px;
+    font-size: 1.2rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .loader {
+    width: 50px;
+    height: 50px;
+  }
+}
