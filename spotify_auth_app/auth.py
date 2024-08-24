@@ -59,10 +59,12 @@ def refresh_access_token():
 
 def get_access_token():
     if token_expiry is None:
-        print("no token")
-    else:
-        if datetime.utcnow() >= token_expiry:
-            return refresh_access_token()
+        print("No token available.")
+        return None
+    if datetime.utcnow() >= token_expiry:
+        print("Token expired, refreshing...")
+        return refresh_access_token()
+    print(f"Using access token: {global_access_token}")
     return global_access_token
 
 
