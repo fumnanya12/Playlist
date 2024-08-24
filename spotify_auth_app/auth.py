@@ -151,8 +151,8 @@ def callback():
     global_access_token = access_token
 
     # Start the scheduler after obtaining the access token
-    scheduler.start()
-    scheduler.add_job(store_play_job, 'interval', minutes=25)
+    #scheduler.start()
+    #scheduler.add_job(store_play_job, 'interval', minutes=25)
     
     return redirect(url_for('welcome'))
 
