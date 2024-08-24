@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays
+from db_operations import store_recent_play, get_all_recent_plays
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 
@@ -99,7 +99,7 @@ def login():
         'response_type': 'code',
         'client_id': SPOTIPY_CLIENT_ID,
         'redirect_uri': SPOTIPY_REDIRECT_URI,
-        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played'
+        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played user-top-read'
     }
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
@@ -279,10 +279,10 @@ def profile():
 "Recently played song "
 @app.route('/recently_played')
 def recently_played():
+    
+    access_token = get_access_token()
     print(access_token)
 
-    access_token = get_access_token()
- 
     if not access_token:
         return redirect(url_for('login'))
     # Fetch user profile information
@@ -392,6 +392,15 @@ def recently_played():
     return result
 
 
+
+'''
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+statistics
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+'''
+
 'storing  recent plays' 
 
 
@@ -482,10 +491,250 @@ def store_play():
     '''
     return result
 
+@app.route('/top_artists')
+def top_artists():
+    access_token = get_access_token()
+    time_range = request.args.get('time_range', 'short_term')  # Default to 'medium_term' if not specified
+    date='Last 4 Weeks'
+    if time_range == 'short_term':
+        date = 'Last 4 Weeks'
+    elif time_range == 'medium_term':
+        date = 'Last 6 Months'
+    elif time_range == 'long_term':
+        date = 'All Year'
+    
+    if not access_token:
+        return redirect(url_for('login'))
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    top_tracks = [] #stored result  
+    limit = 50
+    total_items = 50
+    offset = 0
+    while len(top_tracks) < total_items:
+        response = requests.get(
+            'https://api.spotify.com/v1/me/top/artists',
+            headers=headers,
+           params={'limit': limit, 'offset': offset, 'time_range': time_range}
+        )
+        if response.status_code != 200:
+            return f"Failed to retrieve data: {response.status_code}, {response.text}"
+
+        data = response.json()
+        items = data.get('items', [])
+        top_tracks.extend(items)
+
+        if len(items) < limit:
+            # No more items available
+            break
+
+        offset += limit
+    count = 0
+   
+   
+    playlist_html= ''
+      # Add rows with track details
+    for i in range(0, len(top_tracks), 3):
+        playlist_html += '<tr>'
+        for j in range(3):
+            if i + j < len(top_tracks):
+                track = top_tracks[i + j]
+                artist_name = track['name']
+                Artist_image = track['images'][0]['url']
+                Artist_url = track['external_urls']['spotify']
+                count += 1
+                playlist_html += f'''
+                    <td>
+                        <div class="track-item">
+                            <a href="{Artist_url}" target="_blank">
+                                <img src="{Artist_image}" alt="{artist_name}" class="track-img">
+                                <div class="track-name">{count}. {artist_name}</div>
+                            </a>
+                        </div>
+                    </td>
+                '''
+        playlist_html += '</tr>'
+
+    result= f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Welcome page</title>
+            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='toptrack.css')}">
+
+        </head>
+        <body>
+        
+        <div class="container">
+                <div class="loader" id="loader"></div>
+                <div class="content" id="content">
+                    <div class="page">
+                        <nav class="navbar">
+                            <div class="logo">
+                                <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
+                            </div>
+                            <a href="/welcome">
+                            <button class ="return-button"> <span>Back</span>
+                            </button> </a>
+                            <ul class="nav-links">
+                                <li><a href="/top_tracks">Top Tracks</a></li>
+                                <li><a href="/top_artists">Top Artists</a></li>
+                                <li><a href="/recent_plays">Recently Played</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <h2>Top Tracks ({date}) </h2>
+                                    
+                         <!-- Button elements -->
+                    
+                        <a href="/top_artists?time_range=short_term"> <button class="fourweeks-btn"> <span>Last 4 weeks</span></button> </a>
+                       <a href="/top_artists?time_range=medium_term"><button class="sixmonths-btn"> <span>Last 6 months</span></button> </a>
+                        <a href="/top_artists?time_range=long_term"><button class="twelvemonths-btn"> <span>Last 12 months</span></button></a>
+
+                    <div class="tracks">
+                           <table class="track-table">
+                            {playlist_html}    
+                            </table>
+                    </div>
+                   
+                
+                    
+            </div>
+        </div>
+            <!-- Loader -->
+        <script src="{url_for('static', filename='script.js')}"></script>
+        
+        </body>
+        </html>
+        '''
+    return result
+
+
+@app.route('/top_tracks')
+def top_tracks():
+    access_token = get_access_token()
+    time_range = request.args.get('time_range', 'short_term')  # Default to 'medium_term' if not specified
+    date='Last 4 Weeks'
+    if time_range == 'short_term':
+        date = 'Last 4 Weeks'
+    elif time_range == 'medium_term':
+        date = 'Last 6 Months'
+    elif time_range == 'long_term':
+        date = 'All Year'
+    
+    if not access_token:
+        return redirect(url_for('login'))
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    top_tracks = [] #stored result  
+    limit = 50
+    total_items = 50
+    offset = 0
+    while len(top_tracks) < total_items:
+        response = requests.get(
+            'https://api.spotify.com/v1/me/top/tracks',
+            headers=headers,
+           params={'limit': limit, 'offset': offset, 'time_range': time_range}
+        )
+        if response.status_code != 200:
+            return f"Failed to retrieve data: {response.status_code}, {response.text}"
+
+        data = response.json()
+        items = data.get('items', [])
+        top_tracks.extend(items)
+
+        if len(items) < limit:
+            # No more items available
+            break
+
+        offset += limit
+    count = 0
+   
+   
+    playlist_html= ''
+      # Add rows with track details
+    for i in range(0, len(top_tracks), 3):
+        playlist_html += '<tr>'
+        for j in range(3):
+            if i + j < len(top_tracks):
+                track = top_tracks[i + j]
+                track_name = track['name']
+                artist_name = track['artists'][0]['name']
+                album_image = track['album']['images'][0]['url']
+                track_url = track['external_urls']['spotify']
+                count += 1
+                playlist_html += f'''
+                    <td>
+                        <div class="track-item">
+                            <a href="{track_url}" target="_blank">
+                                <img src="{album_image}" alt="{track_name}" class="track-img">
+                                <div class="track-name">{count}. {track_name} by {artist_name}</div>
+                            </a>
+                        </div>
+                    </td>
+                '''
+        playlist_html += '</tr>'
+
+    result= f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Welcome page</title>
+            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='toptrack.css')}">
+
+        </head>
+        <body>
+        
+        <div class="container">
+                <div class="loader" id="loader"></div>
+                <div class="content" id="content">
+                    <div class="page">
+                        <nav class="navbar">
+                            <div class="logo">
+                                <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
+                            </div>
+                            <a href="/welcome">
+                            <button class ="return-button"> <span>Back</span>
+                            </button> </a>
+                            <ul class="nav-links">
+                                <li><a href="/top_tracks">Top Tracks</a></li>
+                                <li><a href="/top_artists">Top Artists</a></li>
+                                <li><a href="/recent_plays">Recently Played</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <h2>Top Tracks ({date}) </h2>
+                                    
+                         <!-- Button elements -->
+                    
+                        <a href="/top_tracks?time_range=short_term"> <button class="fourweeks-btn"> <span>Last 4 weeks</span></button> </a>
+                       <a href="/top_tracks?time_range=medium_term"><button class="sixmonths-btn"> <span>Last 6 months</span></button> </a>
+                        <a href="/top_tracks?time_range=long_term"><button class="twelvemonths-btn"> <span>Last 12 months</span></button></a>
+
+                    <div class="tracks">
+                           <table class="track-table">
+                            {playlist_html}    
+                            </table>
+                    </div>
+                   
+                
+                    
+            </div>
+        </div>
+            <!-- Loader -->
+        <script src="{url_for('static', filename='script.js')}"></script>
+        
+        </body>
+        </html>
+        '''
+    return result
+
+
+
+
+
 @app.route('/recent_plays')
 def recent_plays():
-    print(access_token)
-
     access_token = get_access_token()
     #print("The access_token is",access_token);
     # print(session)
