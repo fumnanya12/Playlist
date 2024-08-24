@@ -451,7 +451,7 @@ def  store_play_job():
         song_name = item['track']['name']
         song_id = item['track']['id']
         play_time = item['played_at']
-        store_recent_play(song_name, song_id, play_time,count)
+        #store_recent_play(song_name, song_id, play_time,count)
     now = datetime.now()
 
     current_time = now.strftime("%H:%M:%S")
