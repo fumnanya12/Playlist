@@ -1,0 +1,397 @@
+/* Base styles */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #f4f4f4;
+    overflow: auto;
+    text-decoration: none
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    --size: 82px;
+    --color1: #b2b2b2;
+    --color2: #ffffff;
+    --color3: #d9d9d9;
+
+    --gradient: var(--color3) 0 120deg, transparent 0;
+    background: conic-gradient(from -60deg at 50% calc(100% / 3), var(--gradient)),
+                conic-gradient(from 120deg at 50% calc(200% / 3), var(--gradient)),
+                conic-gradient(from 60deg at calc(200% / 3), var(--color3) 60deg, var(--color2) 0 120deg, transparent 0),
+                conic-gradient(from 180deg at calc(100% / 3), var(--color1) 60deg, var(--gradient)),
+                linear-gradient(90deg, var(--color1) calc(100% / 6), var(--color2) 0 50%, var(--color1) 0 calc(500% / 6), var(--color2) 0);
+    background-size: calc(1.732 * var(--size)) var(--size);
+}
+
+/* Navbar styles */
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #149611;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    width: 99%;
+    position: absolute;
+    
+}
+
+.logo {
+    flex-shrink: 0; /* Prevent the logo from shrinking */
+    margin-right: 20px; /* Add some space between the logo and the nav links */
+}
+
+.logo img {
+    height: 50px; /* Adjust the height of the logo */
+    width: auto; /* Maintain the aspect ratio of the logo */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0 20px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.nav-links li a:hover {
+    color: #000000;
+}
+
+
+/* Content styles */
+.content {
+    display: none;
+   
+}
+.page {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+}
+
+/* Loader styles */
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1DB954;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Back button */
+/* From Uiverse.io by BHARGAVPATEL1244 */ 
+.return-button {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: inherit;
+    font-size: inherit;
+    position: absolute;
+    top: 10px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+   }
+   
+   .return-button span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+   }
+   
+   .return-button:hover span {
+    color: black;
+   }
+   
+   .return-button::before,
+   .return-button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .return-button::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .return-button:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+   /* Heading Styles */
+h2 {
+    text-align: center;
+    color: #000000;
+    font-size: 40px;
+    margin-top: -20px; /* Adjust as needed to fit your design */
+    font-weight: normal;
+    position: absolute;
+    top: 3%; /* Adjust this value to position it vertically on the page */
+    left: 40%; /* Adjust this value to position it horizontally on the page */
+    margin-bottom: 20px;
+
+}
+
+/* Back button */
+/* From Uiverse.io by BHARGAVPATEL1244 */ 
+.fourweeks-btn {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: inherit;
+    font-size: inherit;
+    position: absolute;
+    top: 4%; /* Distance from the top */
+    left: 30%; /* Distance from the right */
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+   }
+   
+   .fourweeks-btn span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+   }
+   
+   .fourweeks-btn:hover span {
+    color: black;
+   }
+   
+   .fourweeks-btn::before,
+   .fourweeks-btn::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .fourweeks-btn::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .fourweeks-btn:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+ 
+   .sixmonths-btn {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: inherit;
+    font-size: inherit;
+    position: absolute;
+    top: 4%; /* Distance from the top */
+    left: 45%; /* Distance from the right */
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+   }
+   
+   .sixmonths-btn span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+   }
+   
+   .sixmonths-btn:hover span {
+    color: black;
+   }
+   
+   .sixmonths-btn::before,
+   .sixmonths-btn::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .sixmonths-btn::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .sixmonths-btn:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+   /* Heading Styles */
+
+   .twelvemonths-btn {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: inherit;
+    font-size: inherit;
+    position: absolute;
+    top: 4%; /* Distance from the top */
+    left: 60%; /* Distance from the right */
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+   }
+   
+   .twelvemonths-btn span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+   }
+   
+   .twelvemonths-btn:hover span {
+    color: black;
+   }
+   
+   .twelvemonths-btn::before,
+   .twelvemonths-btn::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .twelvemonths-btn::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .twelvemonths-btn:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+   /* Heading Styles */
+
+   .tracks {
+    display: flex;
+    background-color: #E9E9E9;
+    align-items: center;
+    justify-content: center;
+    position: relative;  /* Change to relative positioning */
+    border-style: solid;
+    border-width: 1.5px 1.5px 1.5px 1.5px;  /* Border on sides and bottom only */
+    border-color: #ffffff;  /* Border color */
+    padding: 20px;       /* Padding for better spacing */
+    margin-top: 300px;    /* Space from the element above */
+    width: auto;         /* Width adjusts based on content */
+    height: auto;        /* Height adjusts based on content */
+    overflow: auto;      /* Ensures scroll if content overflows */
+    top: 50%;
+    text-decoration: none
+
+   }
+
+   .track-table {
+    width: 100%;
+
+    margin: 0 auto; /* Center the table */
+    border-spacing: 20px; /* Space between the cells */
+}
+
+.track-item {
+    text-align: center;
+}
+.track-item a {
+    text-decoration: none; /* Specifically target links inside .track-item */
+    color: inherit; /* Inherit the color from parent to avoid default blue link color */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.track-img {
+    width: 100%; /* Makes the image responsive */
+    max-width: 150px; /* Adjust as needed */
+    height: auto;
+    border-radius: 10px; /* Optional: Adds rounded corners */
+    margin-bottom: 10px; /* Space between image and name */
+}
+.track-item a:hover .track-name {
+    color: #149611;
+}
+
+.track-name {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
