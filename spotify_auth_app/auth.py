@@ -454,7 +454,7 @@ def  store_play_job():
 @app.route('/store_play')
 def store_play():
 
-    store_play_job()
+    #store_play_job()
     result= f'''
     <!DOCTYPE html>
     <html>
