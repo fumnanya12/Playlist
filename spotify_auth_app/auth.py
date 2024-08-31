@@ -465,7 +465,7 @@ def  store_play_job():
 def store_play():
     store_play_job()
     # Add job to scheduler to run every 25 minutes
-    scheduler.add_job(func=store_play_job, trigger="interval", minutes=5)
+    scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
 
     # Start the scheduler
     scheduler.start()
