@@ -9,7 +9,8 @@ load_dotenv()
 
 # MongoDB connection setup
 try:
-    client = pymongo.MongoClient('mongodb://localhost:27017/')
+    mongo_uri = os.getenv('MONGODB_URI')
+    client = pymongo.MongoClient( mongo_uri)
     db = client['spotify_db']
     plays_collection = db['recent_plays']
 except pymongo.errors.ConnectionError as e:
