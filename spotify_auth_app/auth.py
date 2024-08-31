@@ -6,6 +6,8 @@ from datetime import datetime,timedelta
 from .db_operations import store_recent_play, get_all_recent_plays
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
+import atexit
+
 
 
 # Load environment variables fclearom .env file
@@ -13,6 +15,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
 
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
@@ -24,8 +28,7 @@ AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 
-# scheduler
-scheduler = BackgroundScheduler()
+
 
 # Global variable to store access token
 global_access_token = None
@@ -154,9 +157,7 @@ def callback():
     # Store access token in a global variable
     global_access_token = access_token
 
-    # Start the scheduler after obtaining the access token
-    #scheduler.start()
-    #scheduler.add_job(store_play_job, 'interval', minutes=25)
+   
     
     return redirect(url_for('welcome'))
 
@@ -463,6 +464,15 @@ def  store_play_job():
 @app.route('/store_play')
 def store_play():
     store_play_job()
+    # Add job to scheduler to run every 25 minutes
+    scheduler.add_job(func=store_play_job, trigger="interval", minutes=5)
+
+    # Start the scheduler
+    scheduler.start()
+
+    # Ensure the scheduler is shut down when the app exits
+    atexit.register(lambda: scheduler.shutdown())
+
     
     result= f'''
     <!DOCTYPE html>
