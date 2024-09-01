@@ -782,7 +782,9 @@ def recent_plays():
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
-    recent_plays=get_all_recent_plays()
+    user_name= profile_json.get('display_name')
+
+    recent_plays=get_all_recent_plays(user_name)
     playlists_html = '<h2>Your Song History:</h2><ul>'
     for playlist in recent_plays:
         playlists_html += f'<li>{playlist}</li>'

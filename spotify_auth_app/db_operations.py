@@ -51,19 +51,11 @@ def store_recent_play(song_name, song_id, play_time, user_name):
             "play_time": play_time_only
         }
         plays_collection.insert_one(play_data)
-        count+=1
-        print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database")
-     
-def get_recent_plays(user_id, timeframe=24):
-    from datetime import datetime, timedelta
-    time_threshold = datetime.utcnow() - timedelta(hours=timeframe)
-    recent_plays = plays_collection.find({
-        "user_id": user_id,
-        "play_time": {"$gte": time_threshold}
-    })
-    return list(recent_plays)
+       
+        print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database") 
 
-def get_all_recent_plays():
+def get_all_recent_plays(user_name):
+    plays_collection = db[user_name]
     """
     Fetches all recent plays from the database.
     
