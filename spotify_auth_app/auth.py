@@ -207,6 +207,11 @@ def welcome():
         </body>
         </html>
     '''
+    # Add job to scheduler to run every 25 minutes
+    scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
+
+    # Start the scheduler
+    start_scheduler()
     return result
 
 
@@ -472,11 +477,7 @@ def  store_play_job():
 @app.route('/store_play')
 def store_play():
     store_play_job()
-    # Add job to scheduler to run every 25 minutes
-    scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
-
-    # Start the scheduler
-    start_scheduler()
+    
 
     # Ensure the scheduler is shut down when the app exits
     atexit.register(lambda: scheduler.shutdown())
