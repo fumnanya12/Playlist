@@ -18,6 +18,7 @@ app.secret_key = os.urandom(24)
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 
+
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
@@ -42,6 +43,9 @@ def start_scheduler():
     if not scheduler.running:
         scheduler.start()
         print("Scheduler started.")
+
+
+
 def save_tokens(access_token, refresh_token, expires_in):
     global global_access_token, global_refresh_token, token_expiry
     global_access_token = access_token
@@ -123,10 +127,7 @@ def logout():
 
     # Optionally, add a logout message
     print('You have been logged out.', 'info')
-     # Shut down the scheduler
-    if scheduler.running:
-        scheduler.shutdown()
-        print("Scheduler has been shut down due to logout.")
+   
     # Redirect to the login page or home page
     return redirect(url_for('index'))
 
@@ -207,11 +208,7 @@ def welcome():
         </body>
         </html>
     '''
-    # Add job to scheduler to run every 25 minutes
-    scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
 
-    # Start the scheduler
-    start_scheduler()
     return result
 
 
@@ -477,7 +474,13 @@ def  store_play_job():
     print("Recent plays stored successfully.")
 
 # Ensure the scheduler is shut down when the app exits
-    atexit.register(lambda: scheduler.shutdown())
+atexit.register(lambda: scheduler.shutdown())
+
+# Add job to scheduler to run every 25 minutes
+scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
+
+# Start the scheduler
+start_scheduler()
 
 @app.route('/store_play')
 def store_play():
