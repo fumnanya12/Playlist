@@ -123,7 +123,10 @@ def logout():
 
     # Optionally, add a logout message
     print('You have been logged out.', 'info')
-
+     # Shut down the scheduler
+    if scheduler.running:
+        scheduler.shutdown()
+        print("Scheduler has been shut down due to logout.")
     # Redirect to the login page or home page
     return redirect(url_for('index'))
 
