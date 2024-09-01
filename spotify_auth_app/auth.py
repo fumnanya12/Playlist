@@ -37,6 +37,11 @@ global_access_token = None
 global_refresh_token = None
 token_expiry = None
 
+# Function to start the scheduler if it's not already running
+def start_scheduler():
+    if not scheduler.running:
+        scheduler.start()
+        print("Scheduler started.")
 def save_tokens(access_token, refresh_token, expires_in):
     global global_access_token, global_refresh_token, token_expiry
     global_access_token = access_token
@@ -468,7 +473,7 @@ def store_play():
     scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
 
     # Start the scheduler
-    scheduler.start()
+    start_scheduler()
 
     # Ensure the scheduler is shut down when the app exits
     atexit.register(lambda: scheduler.shutdown())
