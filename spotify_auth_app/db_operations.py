@@ -12,7 +12,7 @@ try:
     mongo_uri = os.getenv('MONGODB_URI')
     client = pymongo.MongoClient( mongo_uri)
     db = client['spotify_db']
-    plays_collection = db['recent_plays']
+   # plays_collection = db['recent_plays']
 except pymongo.errors.ConnectionError as e:
     print(f"Could not connect to MongoDB: {e}")
 
@@ -22,9 +22,8 @@ test_data = {
     "song_id": "test_song",
     "play_time": "2024-08-08T12:00:00Z"
 }
-#result = plays_collection.insert_one(test_data)
-#print(f"Inserted document ID: {result.inserted_id}")
-def store_recent_play(song_name, song_id, play_time, count):
+def store_recent_play(song_name, song_id, play_time, user_name):
+    plays_collection = db[user_name]
     # Convert play_time to a datetime object
     play_time_obj = datetime.fromisoformat(play_time[:-1])  
 
@@ -54,7 +53,7 @@ def store_recent_play(song_name, song_id, play_time, count):
         plays_collection.insert_one(play_data)
         count+=1
         print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database")
-        print("song count: ",count)
+     
 def get_recent_plays(user_id, timeframe=24):
     from datetime import datetime, timedelta
     time_threshold = datetime.utcnow() - timedelta(hours=timeframe)

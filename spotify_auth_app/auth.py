@@ -458,7 +458,9 @@ def  store_play_job():
             break
 
         offset += limit
-
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    user_name= profile_json.get('display_name')
 
     print(len(recently_played_tracks))
     count = 0
@@ -467,21 +469,22 @@ def  store_play_job():
         song_name = item['track']['name']
         song_id = item['track']['id']
         play_time = item['played_at']
-        store_recent_play(song_name, song_id, play_time,count)
+        store_recent_play(song_name, song_id, play_time,user_name)
     now = datetime.now()
 
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
     print("Recent plays stored successfully.")
 
+# Ensure the scheduler is shut down when the app exits
+    atexit.register(lambda: scheduler.shutdown())
+
 @app.route('/store_play')
 def store_play():
     store_play_job()
     
 
-    # Ensure the scheduler is shut down when the app exits
-    atexit.register(lambda: scheduler.shutdown())
-
+    
     
     result= f'''
     <!DOCTYPE html>
