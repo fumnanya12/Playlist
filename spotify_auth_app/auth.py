@@ -73,7 +73,10 @@ def refresh_access_token():
         expires_in = refreshed_tokens.get('expires_in')
         new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
         save_tokens(access_token, new_refresh_token, expires_in)
-        return new_refresh_token
+        print("refresh_access_token method")
+        print(f"Access token refreshed: {access_token}")
+        print(f"Refresh token refreshed: {new_refresh_token}")
+        return access_token
     else:
         print(f"Failed to refresh access token: {response.status_code}, {response.text}")
         return None
