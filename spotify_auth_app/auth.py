@@ -489,7 +489,7 @@ def  store_play_job():
 atexit.register(lambda: scheduler.shutdown())
 
 # Add job to scheduler to run every 25 minutes
-scheduler.add_job(func=store_play_job, trigger="interval", minutes=25)
+scheduler.add_job(func=store_play_job, trigger="interval", minutes=15)
 
 # Start the scheduler
 start_scheduler()
