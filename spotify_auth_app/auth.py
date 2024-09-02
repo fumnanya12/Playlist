@@ -50,10 +50,16 @@ def save_tokens(access_token, refresh_token, expires_in):
     global global_access_token, global_refresh_token, token_expiry
     global_access_token = access_token
     global_refresh_token = refresh_token
+    print(f"Access token saved: {access_token}")
+    print(f"Refresh token saved: {refresh_token}")
     token_expiry = datetime.utcnow() + timedelta(seconds=expires_in)
 
 def refresh_access_token():
     global global_refresh_token, global_access_token, token_expiry
+    if not global_refresh_token:
+        print("No refresh token available.")
+        return None
+
     payload = {
         'grant_type': 'refresh_token',
         'refresh_token': global_refresh_token,
@@ -61,14 +67,16 @@ def refresh_access_token():
         'client_secret': SPOTIPY_CLIENT_SECRET
     }
     response = requests.post(TOKEN_URL, data=payload)
-    refreshed_tokens = response.json()
-    access_token = refreshed_tokens.get('access_token')
-    expires_in = refreshed_tokens.get('expires_in')
-    new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
-
-    save_tokens(access_token, new_refresh_token, expires_in)
-    return access_token
-
+    if response.status_code == 200:
+        refreshed_tokens = response.json()
+        access_token = refreshed_tokens.get('access_token')
+        expires_in = refreshed_tokens.get('expires_in')
+        new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
+        save_tokens(access_token, new_refresh_token, expires_in)
+        return access_token
+    else:
+        print(f"Failed to refresh access token: {response.status_code}, {response.text}")
+        return None
 def get_access_token():
     if token_expiry is None:
         print("No token available.")
