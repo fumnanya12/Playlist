@@ -81,6 +81,8 @@ def refresh_access_token():
         print(f"Failed to refresh access token: {response.status_code}, {response.text}")
         return None
 def get_access_token():
+    print("Global access token: ", global_access_token)
+    print("Global refresh token: ", global_refresh_token)
     if token_expiry is None:
         print("No token available.")
         return None
