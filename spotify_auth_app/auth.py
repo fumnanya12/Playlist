@@ -73,7 +73,7 @@ def refresh_access_token():
         expires_in = refreshed_tokens.get('expires_in')
         new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
         save_tokens(access_token, new_refresh_token, expires_in)
-        return access_token
+        return new_refresh_token
     else:
         print(f"Failed to refresh access token: {response.status_code}, {response.text}")
         return None
@@ -434,7 +434,8 @@ statistics
 
 def  store_play_job():
     access_token = get_access_token()
-    print(access_token)
+    print("store play job token: ", access_token)
+    
     
     if not access_token:
         print("No valid token available.FOr store play job")
