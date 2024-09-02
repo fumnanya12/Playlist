@@ -429,8 +429,8 @@ def  store_play_job():
     print(access_token)
     
     if not access_token:
-        return redirect(url_for('login'))
-
+        print("No valid token available.FOr store play job")
+        return 
     headers = {'Authorization': f'Bearer {access_token}'}
 
     recently_played_tracks = []
