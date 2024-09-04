@@ -174,6 +174,7 @@ def callback():
     # Extract user information
     user_id = profile_data.get('id')  # Spotify user ID
     email = profile_data.get('email')  # User email
+    print(email, "email")
     permission="yes"
     
     save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
