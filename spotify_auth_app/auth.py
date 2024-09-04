@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_access_token
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -29,14 +29,13 @@ AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 
+# variable to store user data
+user_name = None
+user_email = None
+global_permissions = None
 
 
-# Global variable to store access token
-global_access_token = None
-# Global variables to store token data
-global_access_token = None
-global_refresh_token = None
-token_expiry = None
+
 
 # Function to start the scheduler if it's not already running
 def start_scheduler():
@@ -45,24 +44,15 @@ def start_scheduler():
         print("Scheduler started.")
 
 
-
-def save_tokens(access_token, refresh_token, expires_in):
-    global global_access_token, global_refresh_token, token_expiry
-    global_access_token = access_token
-    global_refresh_token = refresh_token
-    print(f"Access token saved: {access_token}")
-    print(f"Refresh token saved: {refresh_token}")
-    token_expiry = datetime.utcnow() + timedelta(seconds=expires_in)
-
-def refresh_access_token():
-    global global_refresh_token, global_access_token, token_expiry
-    if not global_refresh_token:
+def refresh_access_token( user_id):
+    None,user_refresh_token,None=get_access_token(user_id)
+    if not user_refresh_token:
         print("No refresh token available.")
         return None
 
     payload = {
         'grant_type': 'refresh_token',
-        'refresh_token': global_refresh_token,
+        'refresh_token': user_refresh_token,
         'client_id': SPOTIPY_CLIENT_ID,
         'client_secret': SPOTIPY_CLIENT_SECRET
     }
@@ -71,26 +61,29 @@ def refresh_access_token():
         refreshed_tokens = response.json()
         access_token = refreshed_tokens.get('access_token')
         expires_in = refreshed_tokens.get('expires_in')
-        new_refresh_token = refreshed_tokens.get('refresh_token', global_refresh_token)
-        save_tokens(access_token, new_refresh_token, expires_in)
+        new_refresh_token = refreshed_tokens.get('refresh_token', user_refresh_token)
+        #save_tokens(access_token, new_refresh_token, expires_in)
+        save_users_to_db(user_id, access_token, new_refresh_token, expires_in,user_email,global_permissions)
         print("refresh_access_token method")
         print(f"Access token refreshed: {access_token}")
         print(f"Refresh token refreshed: {new_refresh_token}")
-        return access_token
+        return access_token, new_refresh_token
     else:
         print(f"Failed to refresh access token: {response.status_code}, {response.text}")
         return None
 def get_access_token():
-    print("Global access token: ", global_access_token)
-    print("Global refresh token: ", global_refresh_token)
+    print("get_access_token method: ", user_name)
+    user_acess_token,None,token_expiry=get_access_token(user_name)
+
+  
     if token_expiry is None:
         print("No token available.")
         return None
     if datetime.utcnow() >= token_expiry:
         print("Token expired, refreshing...")
-        return refresh_access_token()
-    print(f"Using access token: {global_access_token}")
-    return global_access_token
+        return refresh_access_token(user_name)
+    print(f"Using access token: { user_acess_token}")
+    return  user_acess_token
 
 
 @app.route('/')
@@ -146,10 +139,10 @@ def logout():
 
 @app.route('/callback')
 def callback():
-    global global_access_token
+    global global_access_token, user_name,global_permissions,user_email
 
     code = request.args.get('code')
-    if not code:
+    if not code: 
         return 'Authorization failed.'
 
     # Exchange the authorization code for an access token
@@ -172,12 +165,25 @@ def callback():
         return redirect(url_for('login'))
 
 
-    save_tokens(access_token, refresh_token, expires_in)
-    # Store access token in session
-    session['access_token'] = access_token
 
+    # Use the access token to get user profile data
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_response = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_data = profile_response.json()
+
+    # Extract user information
+    user_id = profile_data.get('id')  # Spotify user ID
+    email = profile_data.get('email')  # User email
+    permission="yes"
+    
+    save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
+   
+    print("User information retrieved successfully. callback method")
     # Store access token in a global variable
     global_access_token = access_token
+    user_name=user_id
+    user_email=email
+    global_permissions=permission
 
    
     
@@ -186,6 +192,7 @@ def callback():
 "Welcome Page"
 @app.route('/welcome')
 def welcome():
+    print("Welcome page")
     access_token = get_access_token()
     print(access_token)
     if not access_token:
@@ -228,7 +235,7 @@ def welcome():
 
 @app.route('/profile')
 def profile():
-
+    print("Profile page")
     access_token = get_access_token()
     print(access_token)
 
@@ -484,7 +491,13 @@ def  store_play_job():
     now = datetime.now()
 
     current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
+
+    # Convert to UTC
+    play_time_utc = pytz.utc.localize(current_time)
+    # Convert UTC to Winnipeg time
+    current_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
+   
+    print("Current Time =", current_time_winnipeg)
     print("Recent plays stored successfully.")
 
 # Ensure the scheduler is shut down when the app exits

@@ -1,7 +1,7 @@
 import os
 import pymongo
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime,timedelta
 import pytz
 
 # Load environment variables
@@ -53,6 +53,48 @@ def store_recent_play(song_name, song_id, play_time, user_name):
         plays_collection.insert_one(play_data)
        
         print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database") 
+
+def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,permissions):
+    users_collection = db['users']
+    token_expiry = datetime.utcnow() + timedelta(seconds=token_expiry)
+
+      # Check if the user_id or email already exists
+    existing_user = users_collection.find_one({'$or': [{'user_id': user_id}, {'email': email}]})
+    
+    if existing_user:
+        # Update the existing user's details
+        users_collection.update_one(
+            {'$or': [{'user_id': user_id}, {'email': email}]},
+            {
+                '$set': {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                    'token_expiry': token_expiry,
+                    'permissions': permissions
+                }
+            }
+        )
+        print(f"Updated user with user_id {user_id} or email {email} in the database.")
+    else:
+        users_collection.insert_one({
+            'user_id': user_id,
+            'email': email,
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'token_expiry': token_expiry,
+            'permissions': permissions
+
+        })
+        print(f"Inserted new user with user_id {user_id} and email {email} into the database.")
+def get_access_token(user_name):
+    users_collection = db['users']
+    user = users_collection.find_one({'user_id': user_name})
+    if user:
+        return user['access_token'],user['refresh_token'],user['token_expiry']
+    else:
+        print(f"User {user_name} not found in the database.")
+        return None
+
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
