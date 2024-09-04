@@ -121,7 +121,7 @@ def login():
         'response_type': 'code',
         'client_id': SPOTIPY_CLIENT_ID,
         'redirect_uri': SPOTIPY_REDIRECT_URI,
-        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played user-top-read'
+        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played user-top-read user-read-private user-read-email'
     }
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
