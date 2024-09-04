@@ -174,7 +174,7 @@ def callback():
     # Extract user information
     user_id = profile_data.get('id')  # Spotify user ID
     email = profile_data.get('email')  # User email
-    print(profile_data)
+    #print(profile_data)
     permission="yes"
     
     save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
@@ -491,14 +491,16 @@ def  store_play_job():
         store_recent_play(song_name, song_id, play_time,user_name)
     now = datetime.now()
 
-    current_time = now.strftime("%H:%M:%S")
+   # Convert to UTC
+    play_time_utc = pytz.utc.localize(now)
 
-    # Convert to UTC
-    play_time_utc = pytz.utc.localize(current_time)
     # Convert UTC to Winnipeg time
     current_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
+
+    # Format Winnipeg time as HH:MM:SS
+    current_time_winnipeg_str = current_time_winnipeg.strftime("%H:%M:%S")
    
-    print("Current Time =", current_time_winnipeg)
+    print("Current Time =", current_time_winnipeg_str)
     print("Recent plays stored successfully.")
 
 # Ensure the scheduler is shut down when the app exits
