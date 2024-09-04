@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_access_token
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -45,7 +45,7 @@ def start_scheduler():
 
 
 def refresh_access_token( user_id):
-    user_acess_token,user_refresh_token,token_expirye=get_access_token(user_id)
+    user_acess_token,user_refresh_token,user_token_expiry=get_user_access_token(user_id)
     if not user_refresh_token:
         print("No refresh token available.")
         return None
@@ -73,7 +73,7 @@ def refresh_access_token( user_id):
         return None
 def get_access_token():
     print("get_access_token method: ", user_name)
-    user_acess_token,user_refresh_token,token_expiry=get_access_token(user_name)
+    user_acess_token,user_refresh_token,token_expiry=get_user_access_token(user_name)
 
   
     if token_expiry is None:

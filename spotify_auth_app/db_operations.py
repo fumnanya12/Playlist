@@ -86,7 +86,7 @@ def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,pe
 
         })
         print(f"Inserted new user with user_id {user_id} and email {email} into the database.")
-def get_access_token(user_name):
+def get_user_access_token(user_name):
     users_collection = db['users']
     user = users_collection.find_one({'user_id': user_name})
     if user:
