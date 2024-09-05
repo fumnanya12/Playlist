@@ -503,7 +503,7 @@ def  store_play_job():
         song_id = item['track']['id']
         play_time = item['played_at']
         artists_name = item['track']['artists'][0]['name']
-        store_recent_play(song_name, song_id, play_time,user_name)
+        store_recent_play(song_name, song_id, play_time,user_name,artists_name)
     now = datetime.now()
 
    # Convert to UTC
