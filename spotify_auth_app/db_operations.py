@@ -149,4 +149,4 @@ def get_all_recent_plays(user_name):
         plays_list.append(song_details)
     
     # Convert the cursor to a list of dictionaries
-    return plays_list ,recent_plays
+    return plays_list,recent_plays

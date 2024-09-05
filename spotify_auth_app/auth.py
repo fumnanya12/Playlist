@@ -200,6 +200,7 @@ def callback():
     print(song_list)
     for song in song_list:
         songid=song['song_id']
+        print(songid)
         artist_name=get_data(songid)
         add_artist_name(songid,artist_name,user_name)
 
