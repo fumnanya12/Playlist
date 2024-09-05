@@ -136,6 +136,8 @@ def logout():
    
     # Redirect to the login page or home page
     return redirect(url_for('index'))
+#removing the methode now the databased  has updated
+''' 
 def get_data(song_id):
     access_token = get_access_token()
     if not access_token:
@@ -147,6 +149,7 @@ def get_data(song_id):
     song_json = profile_r.json()
     artist_name=song_json['artists'][0]['name']
     return artist_name
+'''
 @app.route('/callback')
 def callback():
     global global_access_token, user_name,global_permissions,user_email
@@ -196,13 +199,7 @@ def callback():
     user_email=email
     global_permissions=permission
 
-    test,song_list= get_all_recent_plays(user_name)
-    print(song_list ,"test")
-    for song in song_list:
-        songid=song['song_id']
-        print(songid ,"songid")
-        artist_name=get_data(songid)
-        add_artist_name(songid,artist_name,user_name)
+   
 
 
     return redirect(url_for('welcome'))
