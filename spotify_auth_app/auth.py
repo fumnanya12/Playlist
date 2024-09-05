@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,add_artist_name
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -136,7 +136,17 @@ def logout():
    
     # Redirect to the login page or home page
     return redirect(url_for('index'))
+def get_data(song_id):
+    access_token = get_access_token()
+    if not access_token:
+        print("No valid token available.FOr change_data")
+        return None
 
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get(f'https://api.spotify.com/v1/tracks/{song_id}', headers=headers)
+    song_json = profile_r.json()
+    artist_name=song_json['artists'][0]['name']
+    return artist_name
 @app.route('/callback')
 def callback():
     global global_access_token, user_name,global_permissions,user_email
@@ -186,8 +196,13 @@ def callback():
     user_email=email
     global_permissions=permission
 
-   
-    
+    test,song_list= get_all_recent_plays(user_name)
+    for song in song_list:
+        songid=song['song_id']
+        artist_name=get_data(songid)
+        add_artist_name(songid,artist_name,user_name)
+
+
     return redirect(url_for('welcome'))
 
 "Welcome Page"
@@ -488,6 +503,7 @@ def  store_play_job():
         song_name = item['track']['name']
         song_id = item['track']['id']
         play_time = item['played_at']
+        artists_name = item['track']['artists'][0]['name']
         store_recent_play(song_name, song_id, play_time,user_name)
     now = datetime.now()
 
@@ -514,7 +530,7 @@ start_scheduler()
 
 @app.route('/store_play')
 def store_play():
-    store_play_job()
+    #store_play_job()
     
 
     
@@ -556,6 +572,7 @@ def store_play():
     </html>
     '''
     return result
+
 
 @app.route('/top_artists')
 def top_artists():
@@ -817,7 +834,7 @@ def recent_plays():
     profile_json = profile_r.json()
     user_name= profile_json.get('display_name')
 
-    recent_plays=get_all_recent_plays(user_name)
+    recent_plays,recent_json=get_all_recent_plays(user_name)
     playlists_html = '<h2>Your Song History:</h2><ul>'
     for playlist in recent_plays:
         playlists_html += f'<li>{playlist}</li>'

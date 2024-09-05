@@ -22,7 +22,7 @@ test_data = {
     "song_id": "test_song",
     "play_time": "2024-08-08T12:00:00Z"
 }
-def store_recent_play(song_name, song_id, play_time, user_name):
+def store_recent_play(song_name, song_id, play_time, user_name,artist_name):
     plays_collection = db[user_name]
     # Convert play_time to a datetime object
     play_time_obj = datetime.fromisoformat(play_time[:-1])  
@@ -39,6 +39,7 @@ def store_recent_play(song_name, song_id, play_time, user_name):
     existing_play = plays_collection.find_one({
         "song_name": song_name,
         "song_id": song_id,
+        "artist_name": artist_name,
         "play_date": play_date,
         "play_time": play_time_only
     })
@@ -47,12 +48,13 @@ def store_recent_play(song_name, song_id, play_time, user_name):
         play_data = {
             "song_name": song_name,
             "song_id": song_id,
+            "artist_name": artist_name,
             "play_date": play_date,
             "play_time": play_time_only
         }
         plays_collection.insert_one(play_data)
        
-        print(f"Inserted {song_name} by {song_id} on {play_date} at {play_time_only} in the database") 
+        print(f"Inserted {song_name} by {artist_name} on {play_date} at {play_time_only} in the database") 
 
 def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,permissions):
     users_collection = db['users']
@@ -96,6 +98,21 @@ def get_user_access_token(user_name):
         return None
 
 
+def add_artist_name(song_id,artist_name,user_name):
+    song_list= db[user_name]
+    new_data = {"artist_name": artist_name}
+    result = song_list.update_one(
+            {"song_id":song_id },  # Find the document by its _id
+            {"$set": new_data}         # Add the new field to the document
+            )
+    # Step 6: Check if the update was successful
+    if result.matched_count > 0:
+        print(f"Document with _id {song_id} updated successfully.")
+    else:
+        print(f"No document found with _id {song_id}.")
+
+
+
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
     """
@@ -132,4 +149,4 @@ def get_all_recent_plays(user_name):
         plays_list.append(song_details)
     
     # Convert the cursor to a list of dictionaries
-    return plays_list
+    return plays_list ,recent_plays
