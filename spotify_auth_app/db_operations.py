@@ -115,6 +115,7 @@ def add_artist_name(song_id,artist_name,user_name):
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
+    allsongs = plays_collection.find()
     """
     Fetches all recent plays from the database.
     
@@ -149,4 +150,4 @@ def get_all_recent_plays(user_name):
         plays_list.append(song_details)
     
     # Convert the cursor to a list of dictionaries
-    return plays_list,recent_plays
+    return plays_list,allsongs
