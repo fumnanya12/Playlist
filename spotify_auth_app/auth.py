@@ -197,6 +197,7 @@ def callback():
     global_permissions=permission
 
     test,song_list= get_all_recent_plays(user_name)
+    print(song_list)
     for song in song_list:
         songid=song['song_id']
         artist_name=get_data(songid)
