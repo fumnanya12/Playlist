@@ -182,11 +182,14 @@ def callback():
     # Use the access token to get user profile data
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_response = requests.get('https://api.spotify.com/v1/me', headers=headers)
-    print(profile_response.text)
     profile_data = profile_response.json()
 
     # Extract user information
-    user_id = profile_data.get('id')  # Spotify user ID
+    if(profile_data.get('id') is not profile_data.get('display_name')):
+        user_id=profile_data.get('display_name')
+    else:
+        user_id=profile_data.get('id') # Spotify user ID
+    #user_id = profile_data.get('id')  
     email = profile_data.get('email')  # User email
     #print(profile_data)
     permission="yes"
