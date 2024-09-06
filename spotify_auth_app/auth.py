@@ -537,7 +537,7 @@ def store_all_users_plays():
 atexit.register(lambda: scheduler.shutdown())
 
 # Add job to scheduler to run every 25 minutes
-scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=5)
+scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 
 # Start the scheduler
 start_scheduler()
