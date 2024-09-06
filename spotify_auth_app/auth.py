@@ -133,7 +133,7 @@ def logout():
 
     # Optionally, add a logout message
     print('You have been logged out.', 'info')
-   
+    user_name='fumnanya_obi' # Replace with the name of the user you want to log out
     # Redirect to the login page or home page
     return redirect(url_for('index'))
 #removing the methode now the databased  has updated
