@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,add_artist_name
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,add_artist_name,get_all_users
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -128,6 +128,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    global user_name
     # Clear the session
     session.clear()
 
@@ -522,11 +523,21 @@ def  store_play_job():
     print("Current Time =", current_time_winnipeg_str)
     print("Recent plays stored successfully.")
 
+def store_all_users_plays():
+    global user_name
+    User_data= get_all_users()
+    for user in User_data:
+        user_name= user['user_id']
+        print('storing plays for: ',user_name)
+        store_play_job()
+        print("stor_play_job done for ",user_name)
+    
+
 # Ensure the scheduler is shut down when the app exits
 atexit.register(lambda: scheduler.shutdown())
 
 # Add job to scheduler to run every 25 minutes
-scheduler.add_job(func=store_play_job, trigger="interval", minutes=15)
+scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=5)
 
 # Start the scheduler
 start_scheduler()

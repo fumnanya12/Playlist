@@ -96,7 +96,10 @@ def get_user_access_token(user_name):
     else:
         print(f"User {user_name} not found in the database.")
         return None
-
+def get_all_users():
+    users_collection = db['users']
+    all_users = users_collection.find()
+    return all_users
 #method to add artist name can modify and use to change other data 
 def add_artist_name(song_id,artist_name,user_name):
     song_list= db[user_name]
