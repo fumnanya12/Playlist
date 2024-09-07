@@ -205,7 +205,7 @@ def callback():
     print("User information retrieved successfully. callback method")
     # Store access token in a global variable
    
-    Playlist_all_users_plays()
+   # Playlist_all_users_plays()
 
    
 
@@ -620,12 +620,14 @@ def  store_play_job():
 def store_all_users_plays():
     global user_name
     User_data= get_all_users()
+    print("-------------------------------------------------------------------------------------------------------------------")
     for user in User_data:
         user_name= user['user_id']
         print('storing plays for: ',user_name)
         store_play_job()
-        check_for_playlist(user_name)
+       # check_for_playlist(user_name)
         print("stor_play_job done for ",user_name)
+    print("-------------------------------------------------------------------------------------------------------------------")
     
 
 # Ensure the scheduler is shut down when the app exits
