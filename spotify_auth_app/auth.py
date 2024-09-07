@@ -526,21 +526,20 @@ def create_playlist(user_name):
 
 
 def Playlist_all_users_plays():
-    global user_name
     User_data= get_all_users()
     for user in User_data:
-        user_name= user['user_id']
+        current_user_name= user['user_id']
         user_permissions= user['permissions']
         if user_permissions == 'yes':
-            print('creating playlist for: ',user_name)
-            playlist_id=create_playlist(user_name)
+            print('creating playlist for: ',current_user_name)
+            playlist_id=create_playlist(current_user_name)
             if playlist_id is None:
-                print("Error creating playlist for ",user_name)
+                print("Error creating playlist for ",current_user_name)
                 continue
-            check_for_playlist(user_name,playlist_id)
-            print("creating playlist  done for ",user_name)
+            check_for_playlist(current_user_name,playlist_id)
+            print("creating playlist  done for ",current_user_name)
         else:
-            print("no permission to create playlist for: ",user_name)
+            print("no permission to create playlist for: ",current_user_name)
 
 
 
