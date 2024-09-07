@@ -136,9 +136,6 @@ def logout():
     print('You have been logged out.', 'info')
     print(user_name,"User logged out")
 
-    user_name= None # Replace with the name of the user you want to log out
-    user_email = None
-    global_permissions = None
     # Redirect to the login page or home page
     return redirect(url_for('index'))
 #removing the methode now the databased  has updated
