@@ -128,12 +128,14 @@ def login():
 
 @app.route('/logout')
 def logout():
-    global user_name
+    global user_name,global_permissions,user_email
     # Clear the session
     session.clear()
 
     # Optionally, add a logout message
     print('You have been logged out.', 'info')
+    print(user_name,"User logged out")
+
     user_name= None # Replace with the name of the user you want to log out
     user_email = None
     global_permissions = None
@@ -155,7 +157,7 @@ def get_data(song_id):
 '''
 @app.route('/callback')
 def callback():
-    global global_access_token, user_name,global_permissions,user_email
+    global user_name,global_permissions,user_email
 
     code = request.args.get('code')
     if not code: 
@@ -186,7 +188,7 @@ def callback():
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_response = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_data = profile_response.json()
-
+    user_id =None
     # Extract user information
     if(profile_data.get('id') is not profile_data.get('display_name')):
         user_id=profile_data.get('display_name')
@@ -197,6 +199,7 @@ def callback():
     #print(profile_data)
     permission="no"
     
+    user_name=user_id
     save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
    
     print("User information retrieved successfully. callback method")
