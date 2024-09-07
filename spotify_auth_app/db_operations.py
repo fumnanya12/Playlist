@@ -71,8 +71,7 @@ def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,pe
                 '$set': {
                     'access_token': access_token,
                     'refresh_token': refresh_token,
-                    'token_expiry': token_expiry
-                    
+                    'token_expiry': token_expiry  
                 }
             }
         )

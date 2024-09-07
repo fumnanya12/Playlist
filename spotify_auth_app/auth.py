@@ -199,10 +199,7 @@ def callback():
    
     print("User information retrieved successfully. callback method")
     # Store access token in a global variable
-    global_access_token = access_token
-    user_name=user_id
-    user_email=email
-    global_permissions=permission
+   
     Playlist_all_users_plays()
 
    
