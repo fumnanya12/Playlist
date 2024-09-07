@@ -521,8 +521,7 @@ def create_playlist(user_name):
         playlist_data = create_playlist_response.json()
         playlist_id = playlist_data['id']
         print(f"Playlist '{playlist_name}' created successfully with ID: {playlist_id}")
-        return playlist_id
-    return None
+    return playlist_id
 
 
 
