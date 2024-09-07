@@ -470,7 +470,7 @@ def create_playlist(user_name):
 
    
     
-    
+    playlist_id = None
     playlist_name = "Morning playlist"
     playlist_exists = False
     # Spotify API paginates playlists, so we may need to retrieve them in multiple requests
@@ -489,6 +489,7 @@ def create_playlist(user_name):
         for playlist in playlists:
             if playlist['name'].lower() == playlist_name.lower():
                 playlist_exists = True
+                playlist_id = playlist['id']
                 print(f"A playlist with the name '{playlist_name}' already exists.")
                 break
         
@@ -535,7 +536,7 @@ def Playlist_all_users_plays():
             playlist_id=create_playlist(current_user_name)
             if playlist_id is None:
                 print("Error creating playlist for ",current_user_name)
-                continue
+                
             check_for_playlist(current_user_name,playlist_id)
             print("creating playlist  done for ",current_user_name)
         else:
