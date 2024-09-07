@@ -127,7 +127,7 @@ def check_for_playlist(user_name,playlist_id):
         # Step 6: Check if the update was successful
         if result.matched_count > 0:
             print(f"Document with _id {user_name} updated successfully.")
-            print(playlist_collection.count_documents())
+            #print(playlist_collection.count_documents())
         else:
             print(f"No document found with _id {user_name}.")
 
