@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,add_artist_name,get_all_users
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -121,7 +121,7 @@ def login():
         'response_type': 'code',
         'client_id': SPOTIPY_CLIENT_ID,
         'redirect_uri': SPOTIPY_REDIRECT_URI,
-        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played user-top-read user-read-private user-read-email'
+        'scope': 'user-library-read playlist-read-private playlist-read-collaborative user-read-recently-played user-top-read user-read-private user-read-email playlist-modify-public playlist-modify-private'
     }
     auth_url = requests.Request('GET', AUTH_URL, params=auth_query).prepare().url
     return redirect(auth_url)
@@ -193,7 +193,7 @@ def callback():
     #user_id = profile_data.get('id')  
     email = profile_data.get('email')  # User email
     #print(profile_data)
-    permission="yes"
+    permission="no"
     
     save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
    
@@ -203,6 +203,7 @@ def callback():
     user_name=user_id
     user_email=email
     global_permissions=permission
+    Playlist_all_users_plays()
 
    
 
@@ -451,8 +452,100 @@ def recently_played():
 
     return result
 
+'''
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+playlists activity
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+'''
+def create_playlist(user_name):
+    access_token = get_access_token()
+    print("create playlist token: ", access_token)
+    if not access_token:
+        return None
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+   
+    
+    
+    playlist_name = "Morning playlist"
+    playlist_exists = False
+    # Spotify API paginates playlists, so we may need to retrieve them in multiple requests
+    limit = 50  # Number of playlists to retrieve per request
+    offset = 0  # Starting point for each request
+    while not playlist_exists:
+        playlists_response = requests.get(f'https://api.spotify.com/v1/users/{user_name}/playlists', headers=headers ,
+                                params={'limit': limit, 'offset': offset} )
+        if playlists_response.status_code != 200:
+                print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
+                return
+    
+        playlists_data = playlists_response.json()
+        playlists = playlists_data.get('items', [])
+        # Check if a playlist with the same name already exists
+        for playlist in playlists:
+            if playlist['name'].lower() == playlist_name.lower():
+                playlist_exists = True
+                print(f"A playlist with the name '{playlist_name}' already exists.")
+                break
+        
+        # If there are no more playlists to fetch, break the loop
+        if len(playlists) < limit:
+            break
+        
+        # Increment the offset to get the next set of playlists
+        offset += limit
+    if not playlist_exists:
+        playlist_description = "A playlist created using the Spotify API."
+
+        create_playlist_data = {
+            "name": playlist_name,
+            "description": playlist_description,
+            "public": False  # Set to True if you want the playlist to be public
+        }
+
+        create_playlist_response = requests.post(
+            f'https://api.spotify.com/v1/users/{user_name}/playlists',
+            headers=headers,
+            json=create_playlist_data
+        )
+
+        if create_playlist_response.status_code != 201:
+            print(f"Failed to create playlist: {create_playlist_response.status_code}, {create_playlist_response.text}")
+            return
+
+        playlist_data = create_playlist_response.json()
+        playlist_id = playlist_data['id']
+        print(f"Playlist '{playlist_name}' created successfully with ID: {playlist_id}")
+        return playlist_id
+    return None
 
 
+
+def Playlist_all_users_plays():
+    global user_name
+    User_data= get_all_users()
+    for user in User_data:
+        user_name= user['user_id']
+        user_permissions= user['permissions']
+        if user_permissions == 'yes':
+            print('creating playlist for: ',user_name)
+            playlist_id=create_playlist(user_name)
+            if playlist_id is None:
+                print("Error creating playlist for ",user_name)
+                continue
+            check_for_playlist(user_name,playlist_id)
+            print("creating playlist  done for ",user_name)
+        else:
+            print("no permission to create playlist for: ",user_name)
+
+
+
+
+
+
+        
 '''
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -530,6 +623,7 @@ def store_all_users_plays():
         user_name= user['user_id']
         print('storing plays for: ',user_name)
         store_play_job()
+        check_for_playlist(user_name)
         print("stor_play_job done for ",user_name)
     
 
@@ -913,3 +1007,4 @@ def recent_plays():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

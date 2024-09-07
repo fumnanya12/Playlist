@@ -71,8 +71,8 @@ def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,pe
                 '$set': {
                     'access_token': access_token,
                     'refresh_token': refresh_token,
-                    'token_expiry': token_expiry,
-                    'permissions': permissions
+                    'token_expiry': token_expiry
+                    
                 }
             }
         )
@@ -114,7 +114,46 @@ def add_artist_name(song_id,artist_name,user_name):
     else:
         print(f"No document found with _id {song_id}.")
 
+def check_for_playlist(user_name,playlist_id):
+    playlistname = user_name + "_playlist"
+    user=db['users']
+    current_user = user.find_one({'user_id': user_name})
+    if current_user['permissions'] == 'yes':
+        playlist_collection = db[playlistname]
+        new_data = {"Playlist_id": playlist_id}
+        result = user.update_one(
+                {"user_id":user_name },  # Find the document by its _id
+                {"$set": new_data}         # Add the new field to the document
+                )
+        # Step 6: Check if the update was successful
+        if result.matched_count > 0:
+            print(f"Document with _id {user_name} updated successfully.")
+            print(playlist_collection.count_documents())
+        else:
+            print(f"No document found with _id {user_name}.")
 
+
+
+def addsong_to_playlist(user_name,playlist_id,song_details,Date):
+    playlist_name = user_name + "_playlist"
+    playlist_collection = db[playlist_name]
+    song_id=song_details['song_id']
+    song_name=song_details['song_name']
+
+     # Check if the user_id or email already exists
+    existing_user = playlist_collection.find_one({'$or': [{'song_id': song_id}, {'song_name': song_name}]})
+    
+    if existing_user:
+        print("song already exists in the playlist")
+    else:
+        playlist_collection.insert_one({
+            'Playlist_id': playlist_id,
+            'Song_id': song_id,
+            'Song_name': song_name,
+            'Date added': Date
+            
+
+        })
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
