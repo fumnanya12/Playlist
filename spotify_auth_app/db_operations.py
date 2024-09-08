@@ -34,7 +34,7 @@ def store_recent_play(song_name, song_id, play_time, user_name,artist_name):
     # Convert UTC to Winnipeg time
     play_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
     # Separate date and time
-    play_date = play_time_winnipeg.date()  # YYYY-MM-DD
+    play_date = play_time_winnipeg  # YYYY-MM-DD
     play_time_only = play_time_winnipeg.time().isoformat()  # HH:MM:SS.ssssss
      
      # Check if the record already exists
@@ -175,7 +175,7 @@ def get_playlist_tracks(user_name, playlist_id):
     ]
     try:
         print("Aggregation pipeline:", pipeline)
-        
+        newlist = []
         # Execute the aggregation pipeline
         results = plays_collection.aggregate(pipeline)
          # Check if results are returned
@@ -199,7 +199,12 @@ def get_playlist_tracks(user_name, playlist_id):
             print(f"Song: {song_name}, ID: {song_id}")
         
             # Add song to playlist (you can uncomment this line when ready)
-            addsong_to_playlist(user_name, playlist_id, song, current_date)
+            send=addsong_to_playlist(user_name, playlist_id, song, current_date)
+            if send is True:
+                newlist.append(song)
+            else:
+                print("Song already exists in the playlist")
+
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         print("Finished getting playlist tracks for:", user_name)
@@ -209,7 +214,7 @@ def get_playlist_tracks(user_name, playlist_id):
         print(f"Error in get_playlist_tracks: {e}")
         return []
     
-    return results_list
+    return newlist
 
 
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
@@ -217,12 +222,14 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     playlist_collection = db[playlist_name]
     song_id=song_details['_id']['song_id']
     song_name=song_details['_id']['song_name']
+    update=None
 
      # Check if the song already exists
     existing_user = playlist_collection.find_one({'$or': [{'song_id': song_id}, {'song_name': song_name}]})
     
     if existing_user:
         print("song already exists in the playlist")
+        update= False
     else:
         playlist_collection.insert_one({
             'Playlist_id': playlist_id,
@@ -233,6 +240,9 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
 
         })
         print("song added to playlist",playlist_name)
+        update= True
+
+    return update
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
