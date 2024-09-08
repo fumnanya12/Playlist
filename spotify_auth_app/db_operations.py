@@ -169,20 +169,24 @@ def get_playlist_tracks(user_name):
         if not results_list:
             print("No songs found in the aggregation.")
             return []
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         print("Results found:", results_list)
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         # Get the current date
         current_date = datetime.now().date()
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         for song in results_list:
-            print("Processing song from results")
+            print("Processing song from results\n")
             song_name = song['_id']['song_name']  # Access song name from grouped _id
             song_id = song['_id']['song_id']      # Access song id from grouped _id
             print(f"Song: {song_name}, ID: {song_id}")
         
             # Add song to playlist (you can uncomment this line when ready)
             # addsong_to_playlist(user_name, plays_collection['playlist_id'], song, current_date)
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         print("Finished getting playlist tracks for:", user_name)
 
