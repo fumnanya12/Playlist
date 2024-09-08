@@ -189,7 +189,7 @@ def get_playlist_tracks(user_name, playlist_id):
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         # Get the current date
-        current_date = datetime.now().date()
+        current_date = datetime.now()
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
         print("Processing song from results\n")
 
