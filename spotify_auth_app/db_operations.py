@@ -140,52 +140,52 @@ def get_playlist_tracks(user_name):
     plays_collection = db[user_name]
     # Calculate the date 6 days ago
     six_days_ago = datetime.now() - timedelta(days=10)
-    print("Aggregation pipeline: ", pipeline)
-
-    # Aggregate query to count the number of times each song was played and filter for play count > 5
-    pipeline = [
-        {
-        "$match": {  # Match songs where the play_date is greater than 6 days ago
-            "play_date": {"$gte": six_days_ago}
-        }
-    },
-    
-        {
-            "$group": {
-            "_id": {
-                "song_name": "$song_name",
-                "song_id": "$song_id"
-            },  # Group by song name and song_id
-            "play_count": {"$sum": 1}  # Count the occurrences of each song
-        }
-    },
-        {
-            "$match": {
-                "play_count": {"$gte": 3}  # Only return songs played more than 5 times
-            }
-        }
-    ]
-
-    print("Aggregation pipeline: ", pipeline)
-
-   # Execute the aggregation pipeline
     try:
+        print("Aggregation pipeline: ", pipeline)
+
+        # Aggregate query to count the number of times each song was played and filter for play count > 5
+        pipeline = [
+            {
+            "$match": {  # Match songs where the play_date is greater than 6 days ago
+                "play_date": {"$gte": six_days_ago}
+            }
+        },
+        
+            {
+                "$group": {
+                "_id": {
+                    "song_name": "$song_name",
+                    "song_id": "$song_id"
+                },  # Group by song name and song_id
+                "play_count": {"$sum": 1}  # Count the occurrences of each song
+            }
+        },
+            {
+                "$match": {
+                    "play_count": {"$gte": 3}  # Only return songs played more than 5 times
+                }
+            }
+        ]
+
+        print("Aggregation pipeline: ", pipeline)
+
         results = plays_collection.aggregate(pipeline)
+  
+        # Get the current date
+        current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
+        for song in results:
+            print("testing forloop")
+            song_name = song['_id']['song_name']  # Access song name from grouped _id
+            song_id = song['_id']['song_id']      # Access song id from grouped _id
+            print(song_name, song_id)
+        
+            #addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
+        print("getting playlist tracks done for: ",user_name)
+
     except Exception as e:
-        print(f"Error executing pipeline: {e}")
+         # Catch any exceptions and print them
+        print(f"Error in get_playlist_tracks: {e}")
         return []
-
-    # Get the current date
-    current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
-    for song in results:
-        print("testing forloop")
-        song_name = song['_id']['song_name']  # Access song name from grouped _id
-        song_id = song['_id']['song_id']      # Access song id from grouped _id
-        print(song_name, song_id)
-    
-        addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
-    print("getting playlist tracks done for: ",user_name)
-
     return list(results)
 
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
