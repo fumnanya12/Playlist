@@ -151,7 +151,7 @@ def get_playlist_tracks(user_name):
     pipeline = [
         {
             "$match": {  # Match songs where the play_date is greater than 10 days ago
-                "play_date": {"$gte": ten_days_ago}
+                "play_date": {"$lte": ten_days_ago}
             }
         },
         {
