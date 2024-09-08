@@ -135,9 +135,13 @@ def check_for_playlist(user_name,playlist_id):
 
 def get_playlist_tracks(user_name):
     print("getting playlist tracks for: ",user_name)
+    print("Starting aggregation process")
+
     plays_collection = db[user_name]
     # Calculate the date 6 days ago
     six_days_ago = datetime.now() - timedelta(days=10)
+    print("Aggregation pipeline: ", pipeline)
+
     # Aggregate query to count the number of times each song was played and filter for play count > 5
     pipeline = [
         {
@@ -161,7 +165,8 @@ def get_playlist_tracks(user_name):
             }
         }
     ]
-    print(pipeline)
+
+    print("Aggregation pipeline: ", pipeline)
 
     # Execute the aggregation pipeline
     results = plays_collection.aggregate(pipeline)
@@ -169,6 +174,7 @@ def get_playlist_tracks(user_name):
     # Get the current date
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
     for song in results:
+        print("testing forloop")
         song_name = song['_id']['song_name']  # Access song name from grouped _id
         song_id = song['_id']['song_id']      # Access song id from grouped _id
         print(song_name, song_id)
