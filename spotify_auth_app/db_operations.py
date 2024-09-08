@@ -145,16 +145,16 @@ def get_playlist_tracks(user_name):
         raise Exception(f"Collection for user {user_name} does not exist.")
     
     # Calculate the date 10 days ago
-    two_days_ago = datetime.now() - timedelta(days=2)
+    six_days_ago = datetime.now() - timedelta(days=6)
   
-    test_query = plays_collection.find({"play_date": {"$gte": two_days_ago}})
+    test_query = plays_collection.find({"play_date": {"$gte": six_days_ago}})
    # print(list(test_query))
 
      # Define the aggregation pipeline
     pipeline = [
         {
             "$match": {  # Match songs where the play_date is greater than 2 days ago
-                "play_date": {"$gte": two_days_ago}
+                "play_date": {"$gte": six_days_ago}
             }
         },
         {
@@ -166,6 +166,11 @@ def get_playlist_tracks(user_name):
                 "play_count": {"$sum": 1}  # Count occurrences of each song
             }
         },
+        {
+            "$match": {  # Only include songs that have been played more than 3 times
+                "play_count": {"$gte": 3}
+            }
+        }
        
     ]
     try:
@@ -186,9 +191,9 @@ def get_playlist_tracks(user_name):
         # Get the current date
         current_date = datetime.now().date()
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
+        print("Processing song from results\n")
 
         for song in results_list:
-            print("Processing song from results\n")
             song_name = song['_id']['song_name']  # Access song name from grouped _id
             song_id = song['_id']['song_id']      # Access song id from grouped _id
             print(f"Song: {song_name}, ID: {song_id}")
