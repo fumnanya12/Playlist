@@ -160,9 +160,12 @@ def get_playlist_tracks(user_name):
     ]
     # Execute the aggregation pipeline
     results = plays_collection.aggregate(pipeline)
+
+    print("results: ",results)
     # Get the current date
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
     for song in results:
+        print(song)
         addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
     print("getting playlist tracks done for: ",user_name)
 
