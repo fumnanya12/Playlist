@@ -175,11 +175,18 @@ def get_playlist_tracks(user_name):
         
         # Execute the aggregation pipeline
         results = plays_collection.aggregate(pipeline)
+         # Check if results are returned
+        results_list = list(results)
+        if not results_list:
+            print("No songs found in the aggregation.")
+            return []
+
+        print("Results found:", results_list)
 
         # Get the current date
         current_date = datetime.now().date()
 
-        for song in results:
+        for song in results_list:
             print("Processing song from results")
             song_name = song['_id']['song_name']  # Access song name from grouped _id
             song_id = song['_id']['song_id']      # Access song id from grouped _id
@@ -195,7 +202,7 @@ def get_playlist_tracks(user_name):
         print(f"Error in get_playlist_tracks: {e}")
         return []
     
-    return list(results)
+    return results_list
 
 
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
