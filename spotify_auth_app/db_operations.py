@@ -134,6 +134,7 @@ def check_for_playlist(user_name,playlist_id):
             print(f"No document found with _id {user_name}.")
 
 def get_playlist_tracks(user_name):
+    print("getting playlist tracks for: ",user_name)
     plays_collection = db[user_name]
     # Calculate the date 6 days ago
     six_days_ago = datetime.now() - timedelta(days=6)
@@ -163,6 +164,7 @@ def get_playlist_tracks(user_name):
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
     for song in results:
         addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
+    print("getting playlist tracks done for: ",user_name)
 
     return results
 
@@ -186,6 +188,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
             
 
         })
+        print("song added to playlist",playlist_name)
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]

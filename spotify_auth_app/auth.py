@@ -537,6 +537,8 @@ def Playlist_all_users_plays():
 
 
 def add_song_to_playlist():
+    print("-------------------------------------------------------------------------------------------------------------------------------------------")
+
     access_token = get_access_token()
     print("add song to playlist token: ", access_token)
     if not access_token:
@@ -551,6 +553,7 @@ def add_song_to_playlist():
         if user_permissions == 'yes':
             user_playlistid= user['playlist_id']
             for song in song_list:
+                print("song name: ",song['song_name'])
                 song_id=song['song_id']
                 add_song_data = {
             "uris": [f"spotify:track:{song_id}"]
@@ -568,6 +571,7 @@ def add_song_to_playlist():
         else:
             print("no permission to add song to playlist for: ",current_user_name)
 
+    print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
        
 
