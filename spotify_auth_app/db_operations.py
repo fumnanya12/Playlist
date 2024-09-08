@@ -148,9 +148,11 @@ def get_playlist_tracks(user_name):
     
         {
             "$group": {
-                "_id": "$song_name",  # Group by song name (or song_id)
-                "play_count": {"$sum": 1}  # Count the occurrences of each song
-            }
+                "_id": "$song_name", 
+                "song_id": "$song_id"  # Group by song name (or song_id)
+                # Count the occurrences of each song
+            },
+             "play_count": {"$sum": 1} 
         },
         {
             "$match": {
@@ -164,7 +166,9 @@ def get_playlist_tracks(user_name):
     # Get the current date
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
     for song in results:
-        print(song['song_name'],song['song_id'])
+        song_name = song['_id']['song_name']  # Access song name from grouped _id
+        song_id = song['_id']['song_id']      # Access song id from grouped _id
+        print(song_name, song_id)
     
         addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
     print("getting playlist tracks done for: ",user_name)
@@ -174,8 +178,8 @@ def get_playlist_tracks(user_name):
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     playlist_name = user_name + "_playlist"
     playlist_collection = db[playlist_name]
-    song_id=song_details['song_id']
-    song_name=song_details['song_name']
+    song_id=song_details['_id']['song_id']
+    song_name=song_details['_id']['song_name']
 
      # Check if the song already exists
     existing_user = playlist_collection.find_one({'$or': [{'song_id': song_id}, {'song_name': song_name}]})
