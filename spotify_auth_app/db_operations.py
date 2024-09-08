@@ -137,7 +137,7 @@ def get_playlist_tracks(user_name):
     print("getting playlist tracks for: ",user_name)
     plays_collection = db[user_name]
     # Calculate the date 6 days ago
-    six_days_ago = datetime.now() - timedelta(days=6)
+    six_days_ago = datetime.now() - timedelta(days=10)
     # Aggregate query to count the number of times each song was played and filter for play count > 5
     pipeline = [
         {
@@ -154,18 +154,18 @@ def get_playlist_tracks(user_name):
         },
         {
             "$match": {
-                "play_count": {"$gte": 5}  # Only return songs played more than 5 times
+                "play_count": {"$gte": 3}  # Only return songs played more than 5 times
             }
         }
     ]
     # Execute the aggregation pipeline
     results = plays_collection.aggregate(pipeline)
 
-    print("results: ",results)
     # Get the current date
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
     for song in results:
-        print(song)
+        print(song['song_name'],song['song_id'])
+    
         addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
     print("getting playlist tracks done for: ",user_name)
 
