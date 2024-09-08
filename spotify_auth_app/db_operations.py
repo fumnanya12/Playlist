@@ -145,27 +145,13 @@ def get_playlist_tracks(user_name):
         raise Exception(f"Collection for user {user_name} does not exist.")
     
     # Calculate the date 10 days ago
-    ten_days_ago = datetime.now() - timedelta(days=10)
+    ten_days_ago = datetime.now() - timedelta(days=2)
 
     # Define the aggregation pipeline
     pipeline = [
         {
-            "$match": {  # Match songs where the play_date is greater than 10 days ago
-                "play_date": {"$lte": ten_days_ago}
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "song_name": "$song_name",
-                    "song_id": "$song_id"
-                },  # Group by song name and song_id
-                "play_count": {"$sum": 1}  # Count the occurrences of each song
-            }
-        },
-        {
-            "$match": {
-                "play_count": {"$gte": 3}  # Only return songs played more than 3 times
+            "$match": {  
+                "play_date": {"$gte": ten_days_ago}  # Match songs where play_date is recent
             }
         }
     ]
