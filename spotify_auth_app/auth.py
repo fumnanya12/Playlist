@@ -552,12 +552,15 @@ def add_song_to_playlist():
         song_list=get_playlist_tracks(current_user_name)
         if user_permissions == 'yes':
             user_playlistid= user['playlist_id']
+            print("user playlist id: ",user_playlistid)
+            print(song_list)
             for song in song_list:
                 print("song name: ",song['song_name'])
                 song_id=song['song_id']
                 add_song_data = {
             "uris": [f"spotify:track:{song_id}"]
             }
+                print("sending song to spotify")
                 add_song_response = requests.post(
                     f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
                     headers=headers,
