@@ -549,15 +549,14 @@ def add_song_to_playlist():
         current_user_name= user['user_id']
         user_permissions= user['permissions']
         
+        
         if user_permissions == 'yes':
-            get_playlist_tracks(current_user_name)
-            song_list=None
             user_playlistid= user['playlist_id']
             print("user playlist id: ",user_playlistid)
-            #print(song_list)
+            song_list=get_playlist_tracks(current_user_name,user_playlistid)
             for song in song_list:
                 print("song name: ",song['song_name'])
-                song_id=song['song_id']
+                song_id=song['_id']['song_id']
                 add_song_data = {
             "uris": [f"spotify:track:{song_id}"]
             }

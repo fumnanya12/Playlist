@@ -135,7 +135,7 @@ def check_for_playlist(user_name,playlist_id):
 
 from datetime import datetime, timedelta
 
-def get_playlist_tracks(user_name):
+def get_playlist_tracks(user_name, playlist_id):
     print("Getting playlist tracks for:", user_name)
     print("Starting aggregation process")
     
@@ -199,7 +199,7 @@ def get_playlist_tracks(user_name):
             print(f"Song: {song_name}, ID: {song_id}")
         
             # Add song to playlist (you can uncomment this line when ready)
-            # addsong_to_playlist(user_name, plays_collection['playlist_id'], song, current_date)
+            addsong_to_playlist(user_name, playlist_id, song, current_date)
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         print("Finished getting playlist tracks for:", user_name)
