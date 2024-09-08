@@ -34,7 +34,7 @@ def store_recent_play(song_name, song_id, play_time, user_name,artist_name):
     # Convert UTC to Winnipeg time
     play_time_winnipeg = play_time_utc.astimezone(pytz.timezone('America/Winnipeg'))
     # Separate date and time
-    play_date = play_time_winnipeg.date().isoformat()  # YYYY-MM-DD
+    play_date = play_time_winnipeg.date()  # YYYY-MM-DD
     play_time_only = play_time_winnipeg.time().isoformat()  # HH:MM:SS.ssssss
      
      # Check if the record already exists
@@ -151,24 +151,7 @@ def get_playlist_tracks(user_name):
     print(list(test_query))
 
     # Define the aggregation pipeline
-    pipeline = [
-        {
-            "$addFields": {  # Convert play_date string to a datetime
-                "play_date_dt": {
-                    "$dateFromString": {
-                        "dateString": "$play_date",
-                        "format": "%Y-%m-%d"
-                    }
-                }
-            }
-        },
-        {
-            "$match": {  
-                "play_date": {"$gte": ten_days_ago}  # Match songs where play_date is recent
-            }
-        }
-    ]
-
+    pipeline = []
     try:
         print("Aggregation pipeline:", pipeline)
         
@@ -248,7 +231,8 @@ def get_all_recent_plays(user_name):
         try:
             # Assuming play_date is in 'YYYY-MM-DD' format and play_time in 'HH:MM:SS.ssssss'
             if 'play_date' in play and 'play_time' in play:
-                date_part = datetime.strptime(play['play_date'], "%Y-%m-%d")
+                # If play['play_date'] is a date or datetime object
+                date_part = play['play_date'].strftime("%Y-%m-%d")
                 time_part = datetime.strptime(play['play_time'].split('.')[0], "%H:%M:%S")  # Ignore milliseconds
 
                 formatted_date = date_part.strftime("%m/%d/%Y")
