@@ -200,6 +200,7 @@ def get_playlist_tracks(user_name, playlist_id):
         
             # Add song to playlist (you can uncomment this line when ready)
             send=addsong_to_playlist(user_name, playlist_id, song, current_date)
+            print(send)
             if send is True:
                 newlist.append(song)
             else:
@@ -213,7 +214,12 @@ def get_playlist_tracks(user_name, playlist_id):
         # Catch any exceptions and print them
         print(f"Error in get_playlist_tracks: {e}")
         return []
+
+    print("-------------------------------------------------------------------------------------------------------------------------------------------")
     
+    for song in newlist:
+        print(f"Song: {song['_id']['song_name']}, ID: {song['_id']['song_id']}")
+
     return newlist
 
 
@@ -223,6 +229,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     song_id=song_details['_id']['song_id']
     song_name=song_details['_id']['song_name']
     update=None
+    print(song_id,song_name)
 
      # Check if the song already exists
     existing_user = playlist_collection.find_one({'$or': [{'song_id': song_id}, {'song_name': song_name}]})
