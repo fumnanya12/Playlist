@@ -136,7 +136,7 @@ def check_for_playlist(user_name,playlist_id):
 def get_playlist_tracks(user_name):
     print("getting playlist tracks for: ",user_name)
     print("Starting aggregation process")
-
+    results=None
     plays_collection = db[user_name]
     # Calculate the date 6 days ago
     six_days_ago = datetime.now() - timedelta(days=10)
@@ -168,8 +168,12 @@ def get_playlist_tracks(user_name):
 
     print("Aggregation pipeline: ", pipeline)
 
-    # Execute the aggregation pipeline
-    results = plays_collection.aggregate(pipeline)
+   # Execute the aggregation pipeline
+    try:
+        results = plays_collection.aggregate(pipeline)
+    except Exception as e:
+        print(f"Error executing pipeline: {e}")
+        return []
 
     # Get the current date
     current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
@@ -182,7 +186,7 @@ def get_playlist_tracks(user_name):
         addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
     print("getting playlist tracks done for: ",user_name)
 
-    return results
+    return list(results)
 
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     playlist_name = user_name + "_playlist"
