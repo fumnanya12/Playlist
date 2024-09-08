@@ -161,6 +161,8 @@ def get_playlist_tracks(user_name):
             }
         }
     ]
+    print(pipeline)
+
     # Execute the aggregation pipeline
     results = plays_collection.aggregate(pipeline)
 
