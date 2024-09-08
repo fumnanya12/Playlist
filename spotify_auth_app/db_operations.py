@@ -166,11 +166,7 @@ def get_playlist_tracks(user_name):
                 "play_count": {"$sum": 1}  # Count occurrences of each song
             }
         },
-        {
-            "$match": {  # Only include songs that have been played more than 3 times
-                "play_count": {"$gte": 3}
-            }
-        }
+       
     ]
     try:
         print("Aggregation pipeline:", pipeline)
