@@ -150,6 +150,16 @@ def get_playlist_tracks(user_name):
     # Define the aggregation pipeline
     pipeline = [
         {
+            "$addFields": {  # Convert play_date string to a datetime
+                "play_date_dt": {
+                    "$dateFromString": {
+                        "dateString": "$play_date",
+                        "format": "%Y-%m-%d"
+                    }
+                }
+            }
+        },
+        {
             "$match": {  
                 "play_date": {"$gte": ten_days_ago}  # Match songs where play_date is recent
             }
