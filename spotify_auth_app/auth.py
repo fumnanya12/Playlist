@@ -549,8 +549,9 @@ def add_song_to_playlist():
         current_user_name= user['user_id']
         user_permissions= user['permissions']
         
-        song_list=get_playlist_tracks(current_user_name)
         if user_permissions == 'yes':
+            song_list=get_playlist_tracks(current_user_name)
+
             user_playlistid= user['playlist_id']
             print("user playlist id: ",user_playlistid)
             print(song_list)
