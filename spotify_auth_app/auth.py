@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -139,19 +139,7 @@ def logout():
     # Redirect to the login page or home page
     return redirect(url_for('index'))
 #removing the methode now the databased  has updated
-''' 
-def get_data(song_id):
-    access_token = get_access_token()
-    if not access_token:
-        print("No valid token available.FOr change_data")
-        return None
 
-    headers = {'Authorization': f'Bearer {access_token}'}
-    profile_r = requests.get(f'https://api.spotify.com/v1/tracks/{song_id}', headers=headers)
-    song_json = profile_r.json()
-    artist_name=song_json['artists'][0]['name']
-    return artist_name
-'''
 @app.route('/callback')
 def callback():
     global user_name,global_permissions,user_email
@@ -203,6 +191,7 @@ def callback():
     # Store access token in a global variable
    
    # Playlist_all_users_plays()
+    add_song_to_playlist()
 
    
 
@@ -523,6 +512,14 @@ def create_playlist(user_name):
 
 
 def Playlist_all_users_plays():
+    '''
+    Create a playlist for each user in the database.
+
+    This function iterates over all users in the database, and for each user with the 'yes' permission,
+    creates a playlist with the user's name and stores the playlist ID in the user's document.
+
+    '''
+    
     User_data= get_all_users()
     for user in User_data:
         current_user_name= user['user_id']
@@ -539,8 +536,39 @@ def Playlist_all_users_plays():
             print("no permission to create playlist for: ",current_user_name)
 
 
+def add_song_to_playlist():
+    access_token = get_access_token()
+    print("add song to playlist token: ", access_token)
+    if not access_token:
+        return None
+    headers = {'Authorization': f'Bearer {access_token}'}
+    User_data= get_all_users()
+    for user in User_data:
+        current_user_name= user['user_id']
+        user_permissions= user['permissions']
+        user_playlistid= user['playlist_id']
+        song_list=get_playlist_tracks(current_user_name)
+        if user_permissions == 'yes':
+            for song in song_list:
+                song_id=song['song_id']
+                add_song_data = {
+            "uris": [f"spotify:track:{song_id}"]
+            }
+                add_song_response = requests.post(
+                    f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
+                    headers=headers,
+                    json=add_song_data
+                ) 
+                if add_song_response.status_code != 201:
+                    print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
+                else:
+                    print(f"Tracks added to playlist '{user_playlistid}' successfully.")
+
+        else:
+            print("no permission to add song to playlist for: ",current_user_name)
 
 
+       
 
 
         
@@ -614,27 +642,7 @@ def  store_play_job():
     print("Current Time =", current_time_winnipeg_str)
     print("Recent plays stored successfully.")
 
-def store_all_users_plays():
-    global user_name
-    User_data= get_all_users()
-    print("-------------------------------------------------------------------------------------------------------------------")
-    for user in User_data:
-        user_name= user['user_id']
-        print('storing plays for: ',user_name)
-        store_play_job()
-       # check_for_playlist(user_name)
-        print("stor_play_job done for ",user_name)
-    print("-------------------------------------------------------------------------------------------------------------------")
-    
 
-# Ensure the scheduler is shut down when the app exits
-atexit.register(lambda: scheduler.shutdown())
-
-# Add job to scheduler to run every 25 minutes
-scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
-
-# Start the scheduler
-start_scheduler()
 
 @app.route('/store_play')
 def store_play():
@@ -1004,6 +1012,57 @@ def recent_plays():
 
     return result
 
+'''
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+ADmin Login
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+'''
+
+def store_all_users_plays():
+    '''
+    Store all users plays in the database.
+
+    This function retrieves all users from the database and stores their recently played tracks
+    in the database. It calls store_play_job() which is responsible for storing the plays.
+
+    '''
+    
+
+    global user_name
+    User_data= get_all_users()
+    print("-------------------------------------------------------------------------------------------------------------------")
+    for user in User_data:
+        user_name= user['user_id']
+        print('storing plays for: ',user_name)
+        store_play_job()
+       # check_for_playlist(user_name)
+        print("stor_play_job done for ",user_name)
+    print("-------------------------------------------------------------------------------------------------------------------")
+
+''' 
+def get_data(song_id):
+    access_token = get_access_token()
+    if not access_token:
+        print("No valid token available.FOr change_data")
+        return None
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get(f'https://api.spotify.com/v1/tracks/{song_id}', headers=headers)
+    song_json = profile_r.json()
+    artist_name=song_json['artists'][0]['name']
+    return artist_name
+'''
+
+# Ensure the scheduler is shut down when the app exits
+atexit.register(lambda: scheduler.shutdown())
+
+# Add job to scheduler to run every 25 minutes
+scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
+
+# Start the scheduler
+start_scheduler()
 
 if __name__ == '__main__':
     app.run(debug=True)

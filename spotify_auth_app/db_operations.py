@@ -22,6 +22,8 @@ test_data = {
     "song_id": "test_song",
     "play_time": "2024-08-08T12:00:00Z"
 }
+
+
 def store_recent_play(song_name, song_id, play_time, user_name,artist_name):
     plays_collection = db[user_name]
     # Convert play_time to a datetime object
@@ -119,7 +121,7 @@ def check_for_playlist(user_name,playlist_id):
     current_user = user.find_one({'user_id': user_name})
     if current_user['permissions'] == 'yes':
         playlist_collection = db[playlistname]
-        new_data = {"Playlist_id": playlist_id}
+        new_data = {"playlist_id": playlist_id}
         result = user.update_one(
                 {"user_id":user_name },  # Find the document by its _id
                 {"$set": new_data}         # Add the new field to the document
@@ -131,7 +133,38 @@ def check_for_playlist(user_name,playlist_id):
         else:
             print(f"No document found with _id {user_name}.")
 
+def get_playlist_tracks(user_name):
+    plays_collection = db[user_name]
+    # Calculate the date 6 days ago
+    six_days_ago = datetime.now() - timedelta(days=6)
+    # Aggregate query to count the number of times each song was played and filter for play count > 5
+    pipeline = [
+        {
+        "$match": {  # Match songs where the play_date is greater than 6 days ago
+            "play_date": {"$gte": six_days_ago}
+        }
+    },
+    
+        {
+            "$group": {
+                "_id": "$song_name",  # Group by song name (or song_id)
+                "play_count": {"$sum": 1}  # Count the occurrences of each song
+            }
+        },
+        {
+            "$match": {
+                "play_count": {"$gte": 5}  # Only return songs played more than 5 times
+            }
+        }
+    ]
+    # Execute the aggregation pipeline
+    results = plays_collection.aggregate(pipeline)
+    # Get the current date
+    current_date = datetime.now().date()  # This will give you the current date (YYYY-MM-DD)    
+    for song in results:
+        addsong_to_playlist(user_name,plays_collection['playlist_id'],song,current_date)
 
+    return results
 
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     playlist_name = user_name + "_playlist"
@@ -139,7 +172,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     song_id=song_details['song_id']
     song_name=song_details['song_name']
 
-     # Check if the user_id or email already exists
+     # Check if the song already exists
     existing_user = playlist_collection.find_one({'$or': [{'song_id': song_id}, {'song_name': song_name}]})
     
     if existing_user:
