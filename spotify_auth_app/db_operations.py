@@ -146,9 +146,9 @@ def get_playlist_tracks(user_name):
     
     # Calculate the date 10 days ago
     ten_days_ago = datetime.now() - timedelta(days=2)
-    print(plays_collection.find_one())
+  
     test_query = plays_collection.find({"play_date": {"$gte": ten_days_ago}})
-    print(list(test_query))
+   # print(list(test_query))
 
     # Define the aggregation pipeline
     pipeline = [
@@ -157,20 +157,7 @@ def get_playlist_tracks(user_name):
                 "play_date": {"$gte": ten_days_ago}
             }
         },
-        {
-            "$group": {
-                "_id": {
-                    "song_name": "$song_name",
-                    "song_id": "$song_id"
-                },  # Group by song name and song_id
-                "play_count": {"$sum": 1}  # Count the occurrences of each song
-            }
-        },
-        {
-            "$match": {
-                "play_count": {"$gte": 3}  # Only return songs played more than 3 times
-            }
-        }
+        
     ]
     try:
         print("Aggregation pipeline:", pipeline)
