@@ -138,6 +138,8 @@ def get_playlist_tracks(user_name):
     print("Starting aggregation process")
     results=None
     plays_collection = db[user_name]
+    if not plays_collection:
+            raise Exception(f"Collection for user {user_name} does not exist.")
     # Calculate the date 6 days ago
     six_days_ago = datetime.now() - timedelta(days=10)
     try:
