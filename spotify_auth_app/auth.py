@@ -546,9 +546,10 @@ def add_song_to_playlist():
     for user in User_data:
         current_user_name= user['user_id']
         user_permissions= user['permissions']
-        user_playlistid= user['playlist_id']
+        
         song_list=get_playlist_tracks(current_user_name)
         if user_permissions == 'yes':
+            user_playlistid= user['playlist_id']
             for song in song_list:
                 song_id=song['song_id']
                 add_song_data = {
