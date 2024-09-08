@@ -191,7 +191,7 @@ def callback():
     # Store access token in a global variable
    
    # Playlist_all_users_plays()
-   #add_song_to_playlist()
+    add_song_to_playlist()
 
    
 
@@ -1074,5 +1074,4 @@ start_scheduler()
 
 if __name__ == '__main__':
     app.run(debug=True)
-    add_song_to_playlist()
     
