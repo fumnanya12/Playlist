@@ -687,7 +687,12 @@ def add_song_to_playlist():
         
         try:  
             if  str(user_permissions).lower().strip() == 'yes':
-                user_playlistid= user['playlist_id']
+                user_playlistid= user.get('playlist_id')
+
+                  # Check if playlist_id exists and is valid
+                if not user_playlistid:
+                    print(f"User {current_user_name} does not have a valid playlist ID.")
+                    continue
                 print("user playlist id: ",user_playlistid)
                 song_list=get_playlist_tracks(current_user_name,user_playlistid)
                 for song in song_list:
@@ -713,7 +718,24 @@ def add_song_to_playlist():
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
+def adding_song_to_all_users():
+    
+
+    
+    
+
+    global user_name
+    User_data= get_all_users()
+    print("-------------------------------------------------------------------------------------------------------------------")
+    for user in User_data:
+        print("-------------------------------------------------------------------------------------------------------------------")
+        user_name= user['user_id']
+        print('Adding song for: ',user_name)
+        add_song_to_playlist()
        
+        print("stor_play_job done for ",user_name)
+        print("-------------------------------------------------------------------------------------------------------------------")
+    print("-------------------------------------------------------------------------------------------------------------------")       
 
 
         
@@ -1190,22 +1212,7 @@ def get_data(song_id):
     song_json = profile_r.json()
     artist_name=song_json['artists'][0]['name']
     return artist_name
-def adding_song_to_all_users():
-    
 
-    
-    
-
-    global user_name
-    User_data= get_all_users()
-    print("-------------------------------------------------------------------------------------------------------------------")
-    for user in User_data:
-        user_name= user['user_id']
-        print('Adding song for: ',user_name)
-        add_song_to_playlist()
-       
-        print("stor_play_job done for ",user_name)
-    print("-------------------------------------------------------------------------------------------------------------------")
 
 '''
 ---------------------------------------------------------------------------------------------------------------------------------------------------
