@@ -225,7 +225,7 @@ def welcome():
             <button> <span>Logout</span>
             </button> </a>
             <ul class="nav-links">
-                <li><a href="#">Profile</a></li>
+                <li><a href="/user_profile">Profile</a></li>
                 <li class="center"><a href="/profile">Playlists</a></li>
                 <li class="upward"><a href="/recently_played">Recently played</a></li>
                 <li class="forward"><a href="/store_play">Statistics</a></li>
