@@ -230,7 +230,10 @@ h1 {
   margin: 20px 0;
   font-size: 18px;
 }
-
+.profile-text p {
+  text-align: left;
+  font-size: 25px;
+}
 .icon img {
   height: 150px;
   margin-right: 20px;
@@ -247,7 +250,7 @@ h1 {
 
 .buttons button {
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 10px;
   cursor: pointer;
   margin-right: 10px;
 }
@@ -256,7 +259,7 @@ h1 {
   position: absolute;
   top: 10px;
   right: 20px;
-  font-size: 14px;
+  font-size: 24px;
   cursor: pointer;
 }
 
