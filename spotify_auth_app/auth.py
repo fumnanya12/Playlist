@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_admin_user,store_admin_user
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -679,41 +679,42 @@ def add_song_to_playlist():
     if not access_token:
         return None
     headers = {'Authorization': f'Bearer {access_token}'}
-    User_data= get_all_users()
-    for user in User_data:
-        current_user_name= user['user_id']
-        user_permissions= user['permissions']
-        
-        try:  
-            if  str(user_permissions).lower().strip() == 'yes':
-                user_playlistid= user.get('playlist_id')
+    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
 
-                  # Check if playlist_id exists and is valid
-                if not user_playlistid:
-                    print(f"User {current_user_name} does not have a valid playlist ID.")
-                    continue
-                print("user playlist id: ",user_playlistid)
-                song_list=get_playlist_tracks(current_user_name,user_playlistid)
-                for song in song_list:
-                    song_id=song['_id']['song_id']
-                    add_song_data = {
-                "uris": [f"spotify:track:{song_id}"]
-                }
-                    print("sending song to spotify")
-                    add_song_response = requests.post(
-                        f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
-                        headers=headers,
-                        json=add_song_data
-                    ) 
-                    if add_song_response.status_code != 201:
-                        print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
-                    else:
-                        print(f"Tracks added to playlist '{user_playlistid}' successfully.")
+    
+    current_user_name= user_name
+    user_permissions= user_permission
+    
+    try:  
+        if  str(user_permissions).lower().strip() == 'yes':
+            user_playlistid= get_user_playlistid(current_user_name)
 
-            else:
-                print("no permission to add song to playlist for: ",current_user_name)
-        except Exception as e:
-            print("add song to playlist error:",e)
+                # Check if playlist_id exists and is valid
+            if not user_playlistid:
+                print(f"User {current_user_name} does not have a valid playlist ID.")
+                
+            print("user playlist id: ",user_playlistid)
+            song_list=get_playlist_tracks(current_user_name,user_playlistid)
+            for song in song_list:
+                song_id=song['_id']['song_id']
+                add_song_data = {
+            "uris": [f"spotify:track:{song_id}"]
+            }
+                print("sending song to spotify")
+                add_song_response = requests.post(
+                    f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
+                    headers=headers,
+                    json=add_song_data
+                ) 
+                if add_song_response.status_code != 201:
+                    print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
+                else:
+                    print(f"Tracks added to playlist '{user_playlistid}' successfully.")
+
+        else:
+            print("no permission to add song to playlist for: ",current_user_name)
+    except Exception as e:
+        print("add song to playlist error:",e)
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 

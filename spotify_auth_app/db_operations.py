@@ -97,6 +97,14 @@ def get_user_access_token(user_name):
     else:
         print(f"User {user_name} not found in the database.")
         return None
+def get_user_playlistid(user_name):
+    users_collection = db['users']
+    user = users_collection.find_one({'user_id': user_name})
+    if user:
+        return user['playlist_id']
+    else:
+        print(f"User {user_name} not found in the database.")
+        return None
 def update_user_permissions(user_name,permissions):
     users_collection = db['users']
     user = users_collection.find_one({'user_id': user_name})
@@ -130,13 +138,17 @@ def check_for_playlist(user_name,playlist_id):
     playlistname = user_name + "_playlist"
     user=db['users']
     current_user = user.find_one({'user_id': user_name})
-    if current_user['permissions'] == 'yes':
+    if str(current_user['permissions']).lower().strip() == 'yes':
         playlist_collection = db[playlistname]
-        new_data = {"playlist_id": playlist_id}
-        result = user.update_one(
-                {"user_id":user_name },  # Find the document by its _id
-                {"$set": new_data}         # Add the new field to the document
-                )
+        playlist = playlist_collection.find_one({'playlist_id': playlist_id})
+        if playlist:
+            print(f"Playlist with ID {playlist_id} already exists.")
+        else:
+            new_data = {"playlist_id": playlist_id}
+            result = user.update_one(
+                    {"user_id":user_name },  # Find the document by its _id
+                    {"$set": new_data}         # Add the new field to the document
+                    )
         # Step 6: Check if the update was successful
         if result.matched_count > 0:
             print(f"Document with _id {user_name} updated successfully.")
