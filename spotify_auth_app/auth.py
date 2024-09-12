@@ -209,6 +209,17 @@ def welcome():
     headers = {'Authorization': f'Bearer {access_token}'}
     profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
     profile_json = profile_r.json()
+    
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    current_user_name= profile_json.get("display_name")
+    current_user_email= profile_json.get("email")
+    current_user_img= profile_json.get("images")
+    if current_user_img:
+        img_url = current_user_img[0].get("url")
+    else:
+        img_url = url_for('static', filename='user-solid.svg')
+   
     result= f'''
         <!DOCTYPE html>
         <html lang="en" dir="ltr">
@@ -216,7 +227,7 @@ def welcome():
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
             <title> Welcome page | Spotify activity   </title> 
-                <link rel="stylesheet" type="text/css" href="{url_for('static', filename='frontpage.css')}">
+                <link rel="stylesheet" type="text/css" href="{url_for('static', filename='Profile.css')}">
         </head>
         <body>
             <div class="container">  
@@ -225,13 +236,45 @@ def welcome():
             <button> <span>Logout</span>
             </button> </a>
             <ul class="nav-links">
-                <li><a href="/user_profile">Profile</a></li>
+                 <li id="openModal" ><a href=#>Profile</a></li>
                 <li class="center"><a href="/profile">Playlists</a></li>
                 <li class="upward"><a href="/recently_played">Recently played</a></li>
                 <li class="forward"><a href="/store_play">Statistics</a></li>
             </ul>
             </div>
+        <!-- Modal structure -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>User Profile Information</h2>
 
+                <!-- Profile Information -->
+                <div class="profile-info">
+                    
+                    <div class="icon"> 
+                    <img src="{img_url}" alt="Logo">
+                    </div>
+                    <div class="profile-text">
+                    <p><strong>Name:</strong> {current_user_name}</p>
+                    <p><strong>Email:</strong> {current_user_email}/p>
+                   
+                    </div>
+                    
+                </div>
+                <!-- Permission Section -->
+                <div class="permission-section">
+                    <p>Do you grant permission?</p>
+                    <div class="buttons">
+                    <button class="yes-button">Yes</button>
+                    <button class="no-button">No</button>
+                    </div>
+                </div>
+
+
+                </div>
+                </div>
+
+            <script src="{{ url_for('static', filename='profile.js') }}"></script>
 
        
         </body>
