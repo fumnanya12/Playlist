@@ -3,10 +3,12 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,get_admin_user,store_admin_user
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 
@@ -190,9 +192,7 @@ def callback():
     print("User information retrieved successfully. callback method")
     # Store access token in a global variable
    
-   # Playlist_all_users_plays()
-    add_song_to_playlist()
-
+ 
    
 
 
@@ -439,6 +439,86 @@ def recently_played():
     '''
 
     return result
+
+"Profile "
+@app.route('/user_profile')
+def user_profile():
+    access_token = get_access_token()
+    if not access_token:
+        return None
+    headers = {'Authorization': f'Bearer {access_token}'}
+    profile_r = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    profile_json = profile_r.json()
+    current_user_name= profile_json.get("display_name")
+    current_user_email= profile_json.get("email")
+    current_user_img= profile_json.get("images")[0].get("url")
+    img_url= current_user_img
+    if img_url is None:
+        img_url = url_for('static', filename='user-solid.svg')
+    
+    result= f'''
+    <!DOCTYPE html>
+            <html lang="en" dir="ltr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+                <title> profile page | Spotify activity   </title> 
+                    <link rel="stylesheet" type="text/css" href="{url_for('static', filename='Profile.css')}">
+            </head>
+            <body>
+                <div class="container">  
+                <h1>Hello, {profile_json.get("display_name")}!</h1>
+                <a href="/logout">
+                <button> <span>Logout</span>
+                </button> </a>
+                <ul class="nav-links">
+                    <li id="openModal" ><a href="/uer_profile">Profile</a></li>
+                    <li class="center"><a href="/profile">Playlists</a></li>
+                    <li class="upward"><a href="/recently_played">Recently played</a></li>
+                    <li class="forward"><a href="/store_play">Statistics</a></li>
+                </ul>
+                </div>
+             <!-- Modal structure -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>User Profile Information</h2>
+
+                <!-- Profile Information -->
+                <div class="profile-info">
+                    
+                    <div class="icon"> 
+                    <img src="{img_url}" alt="Logo">
+                    </div>
+                    <div class="profile-text">
+                    <p><strong>Name:</strong> {current_user_name}</p>
+                    <p><strong>Email:</strong> {current_user_email}/p>
+                   
+                    </div>
+                    
+                </div>
+                <!-- Permission Section -->
+                <div class="permission-section">
+                    <p>Do you grant permission?</p>
+                    <div class="buttons">
+                    <button class="yes-button">Yes</button>
+                    <button class="no-button">No</button>
+                    </div>
+                </div>
+
+
+                </div>
+                </div>
+
+        
+            </body>
+            </html>
+        '''
+
+
+    return result
+
+
 
 '''
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1019,22 +1099,14 @@ def recent_plays():
 
     return result
 
-'''
----------------------------------------------------------------------------------------------------------------------------------------------------
 
-ADmin Login
 
----------------------------------------------------------------------------------------------------------------------------------------------------
-'''
+
 
 def store_all_users_plays():
-    '''
-    Store all users plays in the database.
+    
 
-    This function retrieves all users from the database and stores their recently played tracks
-    in the database. It calls store_play_job() which is responsible for storing the plays.
-
-    '''
+    
     
 
     global user_name
@@ -1048,7 +1120,7 @@ def store_all_users_plays():
         print("stor_play_job done for ",user_name)
     print("-------------------------------------------------------------------------------------------------------------------")
 
-''' 
+
 def get_data(song_id):
     access_token = get_access_token()
     if not access_token:
@@ -1060,7 +1132,74 @@ def get_data(song_id):
     song_json = profile_r.json()
     artist_name=song_json['artists'][0]['name']
     return artist_name
+
 '''
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+ADmin Login
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Admin Authentication
+def hash_password(password):
+    """Generates a hash for the given password."""
+    return generate_password_hash(password)
+
+def verify_password(stored_password, provided_password):
+    """Verifies the provided password against the stored hash."""
+    return check_password_hash(stored_password, provided_password)
+
+def register_admin(username, password):
+    """Register a new admin with hashed password in the database."""
+    hashed_password = hash_password(password)
+    admin_data = {
+        'username': username,
+        'password': hashed_password
+    }
+    store_admin_user(admin_data)
+
+def authenticate_admin(username, password):
+    """Authenticate admin by checking username and password."""
+    admin_user = get_admin_user(username)
+    if admin_user and verify_password(admin_user['password'], password):
+        return True
+    return False
+# Admin login route
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if authenticate_admin(username, password):
+            session['admin_logged_in'] = True
+            session['admin_username'] = username
+            return redirect(url_for('admin_dashboard'))
+        else:
+            print('Invalid credentials. Please try again.', 'danger')
+    
+    
+
+    print("Welcome page")
+    
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Ensure the scheduler is shut down when the app exits
 atexit.register(lambda: scheduler.shutdown())
@@ -1068,8 +1207,15 @@ atexit.register(lambda: scheduler.shutdown())
 # Add job to scheduler to run every 25 minutes
 scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 
+scheduler.add_job(func=add_song_to_playlist, trigger='cron', day_of_week='fri', hour=0, minute=0)
+
 # Start the scheduler
 start_scheduler()
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

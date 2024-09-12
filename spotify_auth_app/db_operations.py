@@ -290,3 +290,22 @@ def get_all_recent_plays(user_name):
     
     # Convert the cursor to a list of dictionaries
     return plays_list,allsongs
+
+'''
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+ADmin Login
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+'''
+# Fetch admin user by username
+def get_admin_user(username):
+    """Fetches the admin user from the MongoDB collection."""
+    admincollection = db["admins"]
+    return admincollection.find_one({"username": username})
+
+# Store a new admin user
+def store_admin_user(admin_data):
+    """Stores the admin user in the MongoDB collection."""
+    admincollection = db["admins"]
+    db.admins.insert_one(admin_data)
