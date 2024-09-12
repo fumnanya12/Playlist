@@ -301,4 +301,50 @@ h1 {
         font-size: 15px;
         padding: 0.7rem 1.5rem;
     }
+      /* Modal Content Adjustments for Mobile */
+  .modal-content {
+    width: 95%; /* Make the modal more responsive */
+    padding: 30px;
+  }
+
+  .profile-info {
+    flex-direction: column; /* Stack profile icon and text vertically */
+    align-items: center;
+  }
+
+  .profile-text p {
+    text-align: center;
+    font-size: 20px; /* Reduce font size for mobile */
+  }
+
+  .icon img {
+    margin-right: 0; /* Remove right margin */
+    margin-bottom: 20px; /* Add bottom margin for spacing */
+    height: 80px; /* Smaller image for mobile */
+  }
+
+  .permission-section {
+    flex-direction: column; /* Stack the text and buttons vertically */
+    align-items: center;
+  }
+
+  .permission-section p {
+    margin-right: 0; /* Remove margin for mobile */
+    margin-bottom: 10px; /* Add bottom margin for spacing */
+  }
+
+  .buttons button {
+    margin-right: 0; /* Remove right margin */
+    margin-bottom: 10px; /* Add bottom margin for mobile spacing */
+    width: 100%; /* Make buttons full width */
+    max-width: 200px; /* Limit button width */
+  }
+
+  /* Adjust close button for mobile */
+  .close {
+    font-size: 20px;
+    top: 5px;
+    right: 10px;
+  }
+
   }
