@@ -608,7 +608,8 @@ def create_playlist(user_name):
         playlists = playlists_data.get('items', [])
         # Check if a playlist with the same name already exists
         for playlist in playlists:
-            if playlist['name'].lower() == playlist_name.lower():
+            user_playlistname = playlist['name']
+            if str(user_playlistname).lower() == playlist_name.lower():
                 playlist_exists = True
                 playlist_id = playlist['id']
                 print(f"A playlist with the name '{playlist_name}' already exists.")
@@ -659,7 +660,7 @@ def Playlist_all_users_plays():
     for user in User_data:
         current_user_name= user['user_id']
         user_permissions= user['permissions']
-        if user_permissions == 'yes':
+        if str(user_permissions).lower().strip() == 'yes':
             print('creating playlist for: ',current_user_name)
             playlist_id=create_playlist(current_user_name)
             if playlist_id is None:
@@ -684,29 +685,31 @@ def add_song_to_playlist():
         current_user_name= user['user_id']
         user_permissions= user['permissions']
         
-        
-        if  str(user_permissions).lower().strip() == 'yes':
-            user_playlistid= user['playlist_id']
-            print("user playlist id: ",user_playlistid)
-            song_list=get_playlist_tracks(current_user_name,user_playlistid)
-            for song in song_list:
-                song_id=song['_id']['song_id']
-                add_song_data = {
-            "uris": [f"spotify:track:{song_id}"]
-            }
-                print("sending song to spotify")
-                add_song_response = requests.post(
-                    f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
-                    headers=headers,
-                    json=add_song_data
-                ) 
-                if add_song_response.status_code != 201:
-                    print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
-                else:
-                    print(f"Tracks added to playlist '{user_playlistid}' successfully.")
+        try:  
+            if  str(user_permissions).lower().strip() == 'yes':
+                user_playlistid= user['playlist_id']
+                print("user playlist id: ",user_playlistid)
+                song_list=get_playlist_tracks(current_user_name,user_playlistid)
+                for song in song_list:
+                    song_id=song['_id']['song_id']
+                    add_song_data = {
+                "uris": [f"spotify:track:{song_id}"]
+                }
+                    print("sending song to spotify")
+                    add_song_response = requests.post(
+                        f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
+                        headers=headers,
+                        json=add_song_data
+                    ) 
+                    if add_song_response.status_code != 201:
+                        print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
+                    else:
+                        print(f"Tracks added to playlist '{user_playlistid}' successfully.")
 
-        else:
-            print("no permission to add song to playlist for: ",current_user_name)
+            else:
+                print("no permission to add song to playlist for: ",current_user_name)
+        except Exception as e:
+            print("add song to playlist error:",e)
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
