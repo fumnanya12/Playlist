@@ -582,7 +582,7 @@ playlists activity
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 '''
-def create_playlist(user_name):
+def create_playlist():
     access_token = get_access_token()
     print("create playlist token: ", access_token)
     if not access_token:
@@ -655,21 +655,20 @@ def Playlist_all_users_plays():
     creates a playlist with the user's name and stores the playlist ID in the user's document.
 
     '''
-    
-    User_data= get_all_users()
-    for user in User_data:
-        current_user_name= user['user_id']
-        user_permissions= user['permissions']
-        if str(user_permissions).lower().strip() == 'yes':
-            print('creating playlist for: ',current_user_name)
-            playlist_id=create_playlist(current_user_name)
-            if playlist_id is None:
-                print("Error creating playlist for ",current_user_name)
-                
-            check_for_playlist(current_user_name,playlist_id)
-            print("creating playlist  done for ",current_user_name)
-        else:
-            print("no permission to create playlist for: ",current_user_name)
+    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
+
+    current_user_name= user_name
+    user_permissions= user_permission
+    if str(user_permissions).lower().strip() == 'yes':
+        print('creating playlist for: ',current_user_name)
+        playlist_id=create_playlist()
+        if playlist_id is None:
+            print("Error creating playlist for ",current_user_name)
+            
+        check_for_playlist(current_user_name,playlist_id)
+        print("creating playlist  done for ",current_user_name)
+    else:
+        print("no permission to create playlist for: ",current_user_name)
 
 
 def add_song_to_playlist():
