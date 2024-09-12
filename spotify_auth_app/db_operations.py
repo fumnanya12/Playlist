@@ -190,8 +190,8 @@ def get_playlist_tracks(user_name, playlist_id):
             }
         },
         {
-            "$match": {  # Only include songs that have been played more than 3 times
-                "play_count": {"$gte": 3}
+            "$match": {  # Only include songs that have been played more than 4 times
+                "play_count": {"$gte": 4}
             }
         }
        
