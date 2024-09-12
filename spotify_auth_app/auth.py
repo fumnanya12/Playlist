@@ -256,7 +256,7 @@ def welcome():
                     </div>
                     <div class="profile-text">
                     <p><strong>Name:</strong> {current_user_name}</p>
-                    <p><strong>Email:</strong> {current_user_email}/p>
+                    <p><strong>Email:</strong> {current_user_email}</p>
                    
                     </div>
                     
