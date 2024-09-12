@@ -474,7 +474,7 @@ def user_profile():
                 <button> <span>Logout</span>
                 </button> </a>
                 <ul class="nav-links">
-                    <li id="openModal" ><a href="/uer_profile">Profile</a></li>
+                    <li id="openModal" ><a href="/user_profile">Profile</a></li>
                     <li class="center"><a href="/profile">Playlists</a></li>
                     <li class="upward"><a href="/recently_played">Recently played</a></li>
                     <li class="forward"><a href="/store_play">Statistics</a></li>
