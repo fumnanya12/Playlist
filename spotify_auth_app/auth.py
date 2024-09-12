@@ -187,7 +187,7 @@ def callback():
     permission="no"
     
     user_name=user_id
-    session['user_name'] = user_name
+    
     save_users_to_db(user_id, access_token, refresh_token, expires_in,email,permission)
    
     print("User information retrieved successfully. callback method")
@@ -195,8 +195,7 @@ def callback():
    
  
     adding_song_to_all_users()
-    user_name=session.get('user_name')
-
+    user_name=user_id
 
 
     return redirect(url_for('welcome'))
