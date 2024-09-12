@@ -247,7 +247,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     
     if existing_user:
         print("song already exists in the playlist")
-        existing_user.update_one({"Playlist_id": playlist_id}, {"$set": {"Date added": Date}})
+        playlist_collection.update_one({'Song_id': song_id}, {"$set": {"Date added": Date}})
         update= False
     else:
         playlist_collection.insert_one({
