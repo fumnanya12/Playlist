@@ -313,7 +313,7 @@ h1 {
   }
 
   .profile-text p {
-    text-align: center;
+    text-align: left;
     font-size: 20px; /* Reduce font size for mobile */
   }
 

@@ -193,7 +193,7 @@ def callback():
     # Store access token in a global variable
    
  
-   
+    adding_song_to_all_users()
 
 
     return redirect(url_for('welcome'))
