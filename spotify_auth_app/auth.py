@@ -670,7 +670,7 @@ def Playlist_all_users_plays():
 
 def add_song_to_playlist():
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
-
+    Playlist_all_users_plays()
     access_token = get_access_token()
     print("add song to playlist token: ", access_token)
     if not access_token:
@@ -1184,6 +1184,22 @@ def get_data(song_id):
     song_json = profile_r.json()
     artist_name=song_json['artists'][0]['name']
     return artist_name
+def adding_song_to_all_users():
+    
+
+    
+    
+
+    global user_name
+    User_data= get_all_users()
+    print("-------------------------------------------------------------------------------------------------------------------")
+    for user in User_data:
+        user_name= user['user_id']
+        print('Adding song for: ',user_name)
+        add_song_to_playlist()
+       
+        print("stor_play_job done for ",user_name)
+    print("-------------------------------------------------------------------------------------------------------------------")
 
 '''
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1259,7 +1275,7 @@ atexit.register(lambda: scheduler.shutdown())
 # Add job to scheduler to run every 25 minutes
 scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 
-scheduler.add_job(func=add_song_to_playlist, trigger='cron', day_of_week='fri', hour=0, minute=0)
+scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=0)
 
 # Start the scheduler
 start_scheduler()
