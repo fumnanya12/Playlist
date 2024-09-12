@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const noButton = document.querySelector('.no-button');
 
     // Pre-select the option based on the user's previous response
-    const userResponse = "{ response }";  // Response passed from Flask (Yes/No)
+    const userResponse = document.getElementById('permission-response').getAttribute('data-response');  // Response passed from Flask (Yes/No)
     if (userResponse === 'Yes') {
         yesButton.style.backgroundColor = 'green';  // Highlight Yes button
     } else if (userResponse === 'No') {

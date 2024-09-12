@@ -280,7 +280,7 @@ def welcome():
                 </div>
                 </div>
          <!-- Hidden element to store the response dynamically from Flask -->
-         <div id="permission-response" data-response="{ response }" style="display: none;"></div>
+         <div id="permission-response" data-response="{response}" style="display: none;"></div>
             <script src="{ url_for('static', filename='profile.js') }"></script>
 
        
