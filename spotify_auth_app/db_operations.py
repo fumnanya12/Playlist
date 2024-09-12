@@ -93,10 +93,21 @@ def get_user_access_token(user_name):
     users_collection = db['users']
     user = users_collection.find_one({'user_id': user_name})
     if user:
-        return user['access_token'],user['refresh_token'],user['token_expiry']
+        return user['access_token'],user['refresh_token'],user['token_expiry'],user['permissions']
     else:
         print(f"User {user_name} not found in the database.")
         return None
+def update_user_permissions(user_name,permissions):
+    users_collection = db['users']
+    user = users_collection.find_one({'user_id': user_name})
+    if user:
+        users_collection.update_one(
+            {'user_id': user_name},
+            {'$set': {'permissions': permissions}}
+        )
+        print(f"Updated permissions for user {user_name} in the database.")
+    else:
+        print(f"User {user_name} not found in the database.")
 def get_all_users():
     users_collection = db['users']
     all_users = users_collection.find()
@@ -236,6 +247,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     
     if existing_user:
         print("song already exists in the playlist")
+        existing_user.update_one({"Playlist_id": playlist_id}, {"$set": {"Date added": Date}})
         update= False
     else:
         playlist_collection.insert_one({

@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,get_admin_user,store_admin_user
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_admin_user,store_admin_user
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import atexit
@@ -47,7 +47,7 @@ def start_scheduler():
 
 
 def refresh_access_token( user_id):
-    user_acess_token,user_refresh_token,user_token_expiry=get_user_access_token(user_id)
+    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_id)
     if not user_refresh_token:
         print("No refresh token available.")
         return None
@@ -75,7 +75,7 @@ def refresh_access_token( user_id):
         return None
 def get_access_token():
     print("get_access_token method: ", user_name)
-    user_acess_token,user_refresh_token,token_expiry=get_user_access_token(user_name)
+    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
 
   
     if token_expiry is None:
@@ -197,10 +197,16 @@ def callback():
 
 
     return redirect(url_for('welcome'))
-
+@app.route('/submit_permission', methods=['POST'])
+def submit_permission():
+    data = request.json
+    update_user_permissions(user_name,data['response'])
+    return 
 "Welcome Page"
 @app.route('/welcome')
 def welcome():
+    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
+    response=user_permission
     print("Welcome page")
     access_token = get_access_token()
     print(access_token)
@@ -273,7 +279,8 @@ def welcome():
 
                 </div>
                 </div>
-
+         <!-- Hidden element to store the response dynamically from Flask -->
+         <div id="permission-response" data-response="{ response }" style="display: none;"></div>
             <script src="{ url_for('static', filename='profile.js') }"></script>
 
        
