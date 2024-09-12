@@ -196,7 +196,7 @@ def get_playlist_tracks(user_name, playlist_id):
             return []
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
-        print("Results found:", results_list)
+       # print("Results found:", results_list)
         print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         # Get the current date
@@ -228,8 +228,8 @@ def get_playlist_tracks(user_name, playlist_id):
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
     
-    for song in newlist:
-        print(f"Song: {song['_id']['song_name']}, ID: {song['_id']['song_id']}")
+    #for song in newlist:
+       # print(f"Song: {song['_id']['song_name']}, ID: {song['_id']['song_id']}")
 
     return newlist
 

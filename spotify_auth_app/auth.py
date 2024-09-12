@@ -598,7 +598,7 @@ def create_playlist(user_name):
     limit = 50  # Number of playlists to retrieve per request
     offset = 0  # Starting point for each request
     while not playlist_exists:
-        playlists_response = requests.get(f'https://api.spotify.com/v1/users/me/playlists', headers=headers ,
+        playlists_response = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers ,
                                 params={'limit': limit, 'offset': offset} )
         if playlists_response.status_code != 200:
                 print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
@@ -631,7 +631,7 @@ def create_playlist(user_name):
         }
 
         create_playlist_response = requests.post(
-            f'https://api.spotify.com/v1/users/me/playlists',
+        'https://api.spotify.com/v1/me/playlists',
             headers=headers,
             json=create_playlist_data
         )
