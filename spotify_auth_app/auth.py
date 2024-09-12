@@ -451,10 +451,12 @@ def user_profile():
     profile_json = profile_r.json()
     current_user_name= profile_json.get("display_name")
     current_user_email= profile_json.get("email")
-    current_user_img= profile_json.get("images")[0].get("url")
-    img_url= current_user_img
-    if img_url is None:
+    current_user_img= profile_json.get("images")
+    if current_user_img.size == 0:
         img_url = url_for('static', filename='user-solid.svg')
+    else:
+        img_url = current_user_img[0].get("url")
+   
     
     result= f'''
     <!DOCTYPE html>
