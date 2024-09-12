@@ -274,7 +274,7 @@ def welcome():
                 </div>
                 </div>
 
-            <script src="{{ url_for('static', filename='profile.js') }}"></script>
+            <script src="{ url_for('static', filename='profile.js') }"></script>
 
        
         </body>
