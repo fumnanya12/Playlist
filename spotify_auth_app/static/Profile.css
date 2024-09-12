@@ -202,94 +202,57 @@ button {
     transform: translate3d(100%, 0, 0);
    }
 
+/* Styling for modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
 
+.modal-content {
+  background-color: white;
+  padding: 50px;
+  border-radius: 10px;
+  width: 600px;
+  text-align: center;
+}
 
-    /* Modal overlay style */
-  .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stays in place */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    justify-content: center;
-    align-items: center;
-    
-  }
-  
-  /* Modal content */
-  .modal-content {
-    background-color: white;
-    padding: 70px;
-    border-radius: 10px;
-    width: 700px;
-    text-align: center;
-    position: relative;
-  }
-
- /* Profile info container with flexbox */
 .profile-info {
   display: flex;
-  align-items: center; /* Vertically aligns the items */
-  margin: 20px 0;
-  font-size: 18px;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
-/* Profile icon adjustments */
 .icon img {
-  display: block;
-  flex-shrink: 0;
-  margin-right: 40px; /* Adds space between the logo and the profile text */
-  height: 300px; /* Adjusts the height of the image */
-  width: auto; /* Maintains the aspect ratio of the image */
+  height: 150px;
+  margin-right: 20px;
 }
 
-/* Profile text adjustments */
-.profile-text {
- 
-  flex-grow: 1;
-  margin-bottom: 50px;
-  
-}
-.profile-text p {
-  text-align: left;
-  font-size: 25px;
-}
-  
-  /* Close button */
-  .close {
-    position: absolute; /* Position it absolutely within the modal */
-    top: 10px; /* Place it at the top of the modal */
-    right: 20px; /* Align it to the right of the modal */
-    font-size: 24px;
-    cursor: pointer;
-  }
-  /* Permission section container with flexbox */
-
-/* Permission section container with flexbox */
 .permission-section {
   display: flex;
-  justify-content: left;
   align-items: center;
- margin-top: -100px;
-
+  justify-content: center;
 }
 
-.permission-section p {
-  margin-right: 20px; /* Adds space between the text and buttons */
-  font-size: 18px;
-  margin-top: 120px;
-}
-
-/* Style for Yes and No buttons */
 .buttons button {
   padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-right: 10px;
+  margin: 10px;
 }
-   
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
    /* Mobile responsive */
    /* Responsive Styles */
    @media (max-width: 600px) {
