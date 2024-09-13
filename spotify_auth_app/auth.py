@@ -6,6 +6,7 @@ from datetime import datetime,timedelta
 from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
+from pytz import timezone
 import atexit
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -1285,8 +1286,9 @@ atexit.register(lambda: scheduler.shutdown())
 
 # Add job to scheduler to run every 25 minutes
 scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
+winnipeg_tz = timezone('America/Winnipeg')
 
-scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=0)
+scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=1, timezone=winnipeg_tz)
 
 # Start the scheduler
 start_scheduler()
