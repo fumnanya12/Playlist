@@ -149,12 +149,12 @@ def check_for_playlist(user_name,playlist_id):
                     {"user_id":user_name },  # Find the document by its _id
                     {"$set": new_data}         # Add the new field to the document
                     )
-        # Step 6: Check if the update was successful
-        if result.matched_count > 0:
-            print(f"Document with _id {user_name} updated successfully.")
-            #print(playlist_collection.count_documents())
-        else:
-            print(f"No document found with _id {user_name}.")
+            # Step 6: Check if the update was successful
+            if result.matched_count > 0:
+                print(f"Document with _id {user_name} updated successfully.")
+                #print(playlist_collection.count_documents())
+            else:
+                print(f"No document found with _id {user_name}.")
 
 from datetime import datetime, timedelta
 
