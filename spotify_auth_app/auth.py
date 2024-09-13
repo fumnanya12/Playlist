@@ -1288,7 +1288,7 @@ atexit.register(lambda: scheduler.shutdown())
 scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 winnipeg_tz = timezone('America/Winnipeg')
 
-scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=1, timezone=winnipeg_tz)
+scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=1, minute=15, timezone=winnipeg_tz)
 
 # Start the scheduler
 start_scheduler()
