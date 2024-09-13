@@ -219,7 +219,7 @@ def get_playlist_tracks(user_name, playlist_id):
         for song in results_list:
             song_name = song['_id']['song_name']  # Access song name from grouped _id
             song_id = song['_id']['song_id']      # Access song id from grouped _id
-            print(f"Song: {song_name}, ID: {song_id}")
+            #print(f"Song: {song_name}, ID: {song_id}")
         
             # Add song to playlist (you can uncomment this line when ready)
             send=addsong_to_playlist(user_name, playlist_id, song, current_date)
@@ -252,7 +252,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     song_id=song_details['_id']['song_id']
     song_name=song_details['_id']['song_name']
     update=None
-    print(song_id,song_name)
+   # print(song_id,song_name)
 
      # Check if the song already exists
     existing_user = playlist_collection.find_one({'$or': [{'Song_id': song_id}, {'Song_name': song_name}]})
