@@ -33,9 +33,7 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 
 # variable to store user data
-user_name = None
-user_email = None
-global_permissions = None
+
 
 
 
@@ -48,7 +46,7 @@ def start_scheduler():
 
 
 def refresh_access_token( user_id):
-    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_id)
+    user_acess_token,user_refresh_token,token_expiry,user_permission,user_email=get_user_access_token(user_id)
     if not user_refresh_token:
         print("No refresh token available.")
         return None
@@ -66,7 +64,7 @@ def refresh_access_token( user_id):
         expires_in = refreshed_tokens.get('expires_in')
         new_refresh_token = refreshed_tokens.get('refresh_token', user_refresh_token)
         #save_tokens(access_token, new_refresh_token, expires_in)
-        save_users_to_db(user_id, access_token, new_refresh_token, expires_in,user_email,global_permissions)
+        save_users_to_db(user_id, access_token, new_refresh_token, expires_in,user_email,user_permission)
         print("refresh_access_token method")
         print(f"Access token refreshed: {access_token}")
         print(f"Refresh token refreshed: {new_refresh_token}")
@@ -74,9 +72,9 @@ def refresh_access_token( user_id):
     else:
         print(f"Failed to refresh access token: {response.status_code}, {response.text}")
         return None
-def get_access_token():
+def get_access_token(user_name):
     print("get_access_token method: ", user_name)
-    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
+    user_acess_token,user_refresh_token,token_expiry,user_permission,user_email=get_user_access_token(user_name)
 
   
     if token_expiry is None:
@@ -196,7 +194,8 @@ def callback():
    
  
     
-    user_name=user_id
+    # Redirect to the welcome page
+    session['user'] = user_name
 
 
     return redirect(url_for('welcome'))
@@ -208,10 +207,11 @@ def submit_permission():
 "Welcome Page"
 @app.route('/welcome')
 def welcome():
-    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
-    response=user_permission
     print("Welcome page")
-    access_token = get_access_token()
+    current_user=session.get('user')
+    user_acess_token,user_refresh_token,token_expiry,user_permission,user_email=get_user_access_token(current_user)
+    response=user_permission
+    access_token = get_access_token(current_user)
     print(access_token)
     if not access_token:
         return redirect(url_for('login'))
@@ -298,7 +298,8 @@ def welcome():
 @app.route('/profile')
 def profile():
     print("Profile page")
-    access_token = get_access_token()
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     print(access_token)
 
     if not access_token:
@@ -380,7 +381,8 @@ def profile():
 @app.route('/recently_played')
 def recently_played():
     
-    access_token = get_access_token()
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     print(access_token)
 
     if not access_token:
@@ -496,7 +498,8 @@ def recently_played():
 "Profile "
 @app.route('/user_profile')
 def user_profile():
-    access_token = get_access_token()
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     if not access_token:
         return None
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -582,8 +585,8 @@ playlists activity
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 '''
-def create_playlist():
-    access_token = get_access_token()
+def create_playlist(current_user):
+    access_token = get_access_token(current_user)
     print("create playlist token: ", access_token)
     if not access_token:
         return None
@@ -647,7 +650,7 @@ def create_playlist():
 
 
 
-def Playlist_all_users_plays():
+def Playlist_all_users_plays(current_user):
     '''
     Create a playlist for each user in the database.
 
@@ -655,13 +658,14 @@ def Playlist_all_users_plays():
     creates a playlist with the user's name and stores the playlist ID in the user's document.
 
     '''
-    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
+    user_acess_token,user_refresh_token,token_expiry,user_permission,user_email=get_user_access_token(current_user)
 
-    current_user_name= user_name
+
+    current_user_name= current_user
     user_permissions= user_permission
     if str(user_permissions).lower().strip() == 'yes':
         print('creating playlist for: ',current_user_name)
-        playlist_id=create_playlist()
+        playlist_id=create_playlist(current_user)
         if playlist_id is None:
             print("Error creating playlist for ",current_user_name)
         else:   
@@ -671,15 +675,16 @@ def Playlist_all_users_plays():
         print("no permission to create playlist for: ",current_user_name)
 
 
-def add_song_to_playlist():
+def add_song_to_playlist(current_user):
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
-    Playlist_all_users_plays()
-    access_token = get_access_token()
+    Playlist_all_users_plays(current_user)
+    access_token = get_access_token(current_user)
     print("add song to playlist token: ", access_token)
     if not access_token:
         return None
     headers = {'Authorization': f'Bearer {access_token}'}
-    user_acess_token,user_refresh_token,token_expiry,user_permission=get_user_access_token(user_name)
+    user_acess_token,user_refresh_token,token_expiry,user_permission,user_email=get_user_access_token(current_user)
+
 
     
     current_user_name= user_name
@@ -719,20 +724,14 @@ def add_song_to_playlist():
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
 def adding_song_to_all_users():
-    
-
-    
-    
-
-    global user_name
     User_data= get_all_users()
     print("-------------------------------------------------------------------------------------------------------------------")
     for user in User_data:
         user_name= user['user_id']
         print('Adding song for: ',user_name)
-        add_song_to_playlist()
+        add_song_to_playlist(user_name)
        
-        print("stor_play_job done for ",user_name)
+        print("Adding song job done for ",user_name)
       
     print("-------------------------------------------------------------------------------------------------------------------")       
 
@@ -749,8 +748,9 @@ statistics
 'storing  recent plays' 
 
 
-def  store_play_job():
-    access_token = get_access_token()
+def  store_play_job(current_user):
+
+    access_token = get_access_token(current_user)
     print("store play job token: ", access_token)
     
     
@@ -858,7 +858,8 @@ def store_play():
 
 @app.route('/top_artists')
 def top_artists():
-    access_token = get_access_token()
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     time_range = request.args.get('time_range', 'short_term')  # Default to 'medium_term' if not specified
     date='Last 4 Weeks'
     if time_range == 'short_term':
@@ -979,7 +980,8 @@ def top_artists():
 
 @app.route('/top_tracks')
 def top_tracks():
-    access_token = get_access_token()
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     time_range = request.args.get('time_range', 'short_term')  # Default to 'medium_term' if not specified
     date='Last 4 Weeks'
     if time_range == 'short_term':
@@ -1104,8 +1106,9 @@ def top_tracks():
 
 @app.route('/recent_plays')
 def recent_plays():
-    #store_play_job()
-    access_token = get_access_token()
+   
+    current_user=session.get('user')
+    access_token = get_access_token(current_user)
     #print("The access_token is",access_token);
     # print(session)
     if not access_token:
@@ -1183,20 +1186,16 @@ def recent_plays():
 
 
 def store_all_users_plays():
-    
 
-    
-    
-
-    global user_name
     User_data= get_all_users()
     print("-------------------------------------------------------------------------------------------------------------------")
     for user in User_data:
         user_name= user['user_id']
         print('storing plays for: ',user_name)
-        store_play_job()
+        store_play_job(user_name)
        # check_for_playlist(user_name)
         print("stor_play_job done for ",user_name)
+    
     print("-------------------------------------------------------------------------------------------------------------------")
 
 
@@ -1288,7 +1287,7 @@ atexit.register(lambda: scheduler.shutdown())
 scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 winnipeg_tz = timezone('America/Winnipeg')
 
-scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=1, minute=39, timezone=winnipeg_tz)
+scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=5, timezone=winnipeg_tz)
 
 # Start the scheduler
 start_scheduler()

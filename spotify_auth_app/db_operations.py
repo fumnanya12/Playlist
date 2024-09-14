@@ -93,7 +93,7 @@ def get_user_access_token(user_name):
     users_collection = db['users']
     user = users_collection.find_one({'user_id': user_name})
     if user:
-        return user['access_token'],user['refresh_token'],user['token_expiry'],user['permissions']
+        return user['access_token'],user['refresh_token'],user['token_expiry'],user['permissions'],user['email']
     else:
         print(f"User {user_name} not found in the database.")
         return None
