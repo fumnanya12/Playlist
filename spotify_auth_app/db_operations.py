@@ -297,8 +297,11 @@ def get_all_recent_plays(user_name):
         try:
             # Assuming play_date is in 'YYYY-MM-DD' format and play_time in 'HH:MM:SS.ssssss'
             if 'play_date' in play and 'play_time' in play:
-                # If play['play_date'] is a date or datetime object
-                date_part = play['play_date'].strftime("%Y-%m-%d")
+                # Parse play_date if it's a string
+                if isinstance(play['play_date'], str):
+                    date_part = datetime.strptime(play['play_date'], "%Y-%m-%d")
+                else:
+                    date_part = play['play_date']  # If it's already a datetime object
                 time_part = datetime.strptime(play['play_time'].split('.')[0], "%H:%M:%S")  # Ignore milliseconds
 
                 formatted_date = date_part.strftime("%m/%d/%Y")
