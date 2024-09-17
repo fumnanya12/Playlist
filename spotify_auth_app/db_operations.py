@@ -60,7 +60,9 @@ def store_recent_play(song_name, song_id, play_time, user_name,artist_name):
 
 def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,permissions):
     users_collection = db['users']
-    token_expiry = datetime.utcnow() + timedelta(seconds=token_expiry)
+    if isinstance(token_expiry, (int, float)):  # Assuming token_expiry is seconds if not datetime
+        token_expiry = datetime.utcnow() + timedelta(seconds=token_expiry)
+
 
       # Check if the user_id or email already exists
     existing_user = users_collection.find_one({'$or': [{'user_id': user_id}, {'email': email}]})
@@ -76,6 +78,7 @@ def save_users_to_db(user_id, access_token, refresh_token, token_expiry,email,pe
                     'token_expiry': token_expiry  
                 }
             }
+        ,upsert=True  # Ensure that upsert=True is set
         )
         print(f"Updated user with user_id {user_id} or email {email} in the database.")
     else:
@@ -206,10 +209,8 @@ def get_playlist_tracks(user_name, playlist_id):
         if not results_list:
             print("No songs found in the aggregation.")
             return []
-        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
        # print("Results found:", results_list)
-        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
         # Get the current date
         current_date = datetime.now()
@@ -238,14 +239,70 @@ def get_playlist_tracks(user_name, playlist_id):
         print(f"Error in get_playlist_tracks: {e}")
         return []
 
-    print("-------------------------------------------------------------------------------------------------------------------------------------------")
-    
-    #for song in newlist:
-       # print(f"Song: {song['_id']['song_name']}, ID: {song['_id']['song_id']}")
 
     return newlist
+def delete_old_songs(user_name):
+    playlist_name = user_name + "_playlist"
+    playlist_collection = db[playlist_name]
+    newlist = []
+    if playlist_collection is None:
+        print("Collection not found.")
+        raise Exception(f"Collection for user {user_name} does not exist.")
+    # Calculate the date 1 month ago
+    one_month_ago = datetime.now() - timedelta(days=30)
+    pipeline = [
+        {
+            "$match": {  # Match songs where the play_date is greater than 2 days ago
+                "play_date": {"$gte": one_month_ago}
+            }
+        },
+        {
+            "$group": {  # Group by song name and song_id
+                "_id": {
+                    "song_name": "$song_name",
+                    "song_id": "$song_id"
+                },
+               
+            }
+        },
+    ]
+    try:
+        print("Aggregation pipeline:", pipeline)
+        newlist = []
+        # Execute the aggregation pipeline
+        results = playlist_collection.aggregate(pipeline)
+            # Check if results are returned
+        results_list = list(results)
+        if not results_list:
+            print("No songs found in the aggregation.")
+            return []
+
+        # print("Results found:", results_list)
+
+        
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
+        print("Processing song from results\n")
+
+        for song in results_list:
+            song_name = song['_id']['song_name']  # Access song name from grouped _id
+            song_id = song['_id']['song_id']      # Access song id from grouped _id
+            newlist.append(song)
+        
+            playlist_collection.delete_one({'Song_id': song_id})        
+            print("Finished removing", song_name, "from the playlist")
+   
+            
+
+        print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
 
+    except Exception as e:
+        # Catch any exceptions and print them
+        print(f"Error in get_playlist_tracks: {e}")
+        return []
+
+    return newlist
+       
 def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     playlist_name = user_name + "_playlist"
     playlist_collection = db[playlist_name]

@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from pytz import timezone
@@ -687,7 +687,7 @@ def add_song_to_playlist(current_user):
 
 
     
-    current_user_name= user_name
+    current_user_name= current_user
     user_permissions= user_permission
     
     try:  
@@ -729,14 +729,70 @@ def adding_song_to_all_users():
     for user in User_data:
         user_name= user['user_id']
         print('Adding song for: ',user_name)
+        delete_song_from_playlist(user_name)
         add_song_to_playlist(user_name)
        
         print("Adding song job done for ",user_name)
       
     print("-------------------------------------------------------------------------------------------------------------------")       
 
+def delete_song_from_playlist(current_user):
+    print("-------------------------------------------------------------------------------------------------------------------------------------------")
+    access_token = get_access_token(current_user)
+    print("delete song from playlist token: ", access_token)
+    
+    if not access_token:
+        return None
+    
+    headers = {'Authorization': f'Bearer {access_token}'}
+    user_acess_token, user_refresh_token, token_expiry, user_permission, user_email = get_user_access_token(current_user)
+    
+    current_user_name = current_user
+    user_permissions = user_permission
+    
+    try:  
+        if str(user_permissions).lower().strip() == 'yes':
+            user_playlistid = get_user_playlistid(current_user_name)
 
+            # Check if playlist_id exists and is valid
+            if not user_playlistid:
+                print(f"User {current_user_name} does not have a valid playlist ID.")
+                return None
+                
+            print("user playlist id: ", user_playlistid)
+            song_list = delete_old_songs(current_user_name)
+             # Break early if song_list is None or empty
+            if not song_list:
+                print(f"No songs found for deletion in playlist '{user_playlistid}'.")
+                return None
+            for song in song_list:
+                song_id = song['_id']['song_id']
+                
+                delete_song_data = {
+                    "tracks": [{"uri": f"spotify:track:{song_id}"}]
+                }
+
+                print("sending request to delete song from spotify")
+                delete_song_response = requests.delete(
+                    f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
+                    headers=headers,
+                    json=delete_song_data
+                )
+
+                if delete_song_response.status_code != 200:
+                    print(f"Failed to delete track from playlist: {delete_song_response.status_code}, {delete_song_response.text}")
+                else:
+                    print(f"Track '{song_id}' removed from playlist '{user_playlistid}' successfully.")
         
+        else:
+            print(f"No permission to delete songs from playlist for: {current_user_name}")
+
+    except Exception as e:
+        print(f"delete song from playlist error: {e}")
+    
+    print("-------------------------------------------------------------------------------------------------------------------------------------------")
+
+
 '''
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
