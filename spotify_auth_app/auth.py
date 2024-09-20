@@ -246,7 +246,7 @@ def welcome():
             </button> </a>
             <ul class="nav-links">
                  <li id="openModal" ><a href=#>Profile</a></li>
-                <li class="center"><a href="/profile">Playlists</a></li>
+                <li class="center"><a href="/playlist">Playlists</a></li>
                 <li class="upward"><a href="/recently_played">Recently played</a></li>
                 <li class="forward"><a href="/store_play">Statistics</a></li>
             </ul>
@@ -295,7 +295,7 @@ def welcome():
 
 
 
-@app.route('/profile')
+@app.route('/playlist')
 def profile():
     print("Profile page")
     current_user=session.get('user')
@@ -315,7 +315,7 @@ def profile():
     playlists_html = '<h2>Your Playlists:</h2><ul>'
     for playlist in playlists_json.get('items', []):
         if(playlist.get("owner").get("id") == profile_json.get("id")): #get playlist created by the user 
-            playlists_html += f'<li>{playlist.get("name")}</li>'
+            playlists_html += f'<li><a href="/playlist/{playlist.get("id")}">{playlist.get("name")}</a></li>'
     playlists_html += '</ul>'
     result= f'''
     <!DOCTYPE html>
@@ -531,7 +531,7 @@ def user_profile():
                 </button> </a>
                 <ul class="nav-links">
                     <li id="openModal" ><a href=#>Profile</a></li>
-                    <li class="center"><a href="/profile">Playlists</a></li>
+                    <li class="center"><a href="/playlist">Playlists</a></li>
                     <li class="upward"><a href="/recently_played">Recently played</a></li>
                     <li class="forward"><a href="/store_play">Statistics</a></li>
                 </ul>
