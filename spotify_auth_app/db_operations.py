@@ -253,7 +253,7 @@ def delete_old_songs(user_name):
     pipeline = [
         {
             "$match": {  # Match songs where the play_date is greater than 2 days ago
-                "play_date": {"$gte": one_month_ago}
+                "Date added": {"$gte": one_month_ago}
             }
         },
         {
@@ -316,6 +316,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     
     if existing_user:
         print("song already exists in the playlist")
+        print("updating date added")
         playlist_collection.update_one({'Song_id': song_id}, {"$set": {"Date added": Date}})
         update= False
     else:
