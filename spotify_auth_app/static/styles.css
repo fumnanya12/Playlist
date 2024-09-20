@@ -28,6 +28,13 @@ li {
     text-decoration: none;
 }
 
+a {
+    text-decoration: none;
+}
+a:hover{
+    color: #1DB954;
+}
+
 
 /* Back button */
 /* From Uiverse.io by BHARGAVPATEL1244 */ 
