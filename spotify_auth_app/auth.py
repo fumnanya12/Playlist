@@ -314,7 +314,6 @@ def profile():
     playlists_html = '<h2>Your Playlists:</h2><ul>'
     for playlist in playlists_json.get('items', []):
         playlist_url=playlist.get("external_urls").get("spotify")
-
         if(playlist.get("owner").get("id") == profile_json.get("id")): #get playlist created by the user 
             playlists_html += f'<li><a href="{playlist_url}">{playlist.get("name")}</a></li>'
     playlists_html += '</ul>'
