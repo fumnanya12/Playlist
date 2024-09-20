@@ -311,11 +311,12 @@ def profile():
     # Fetch user playlists
     playlists_r = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers)
     playlists_json = playlists_r.json()
-   
     playlists_html = '<h2>Your Playlists:</h2><ul>'
     for playlist in playlists_json.get('items', []):
+        playlist_url=playlist.get("external_urls").get("spotify")
+
         if(playlist.get("owner").get("id") == profile_json.get("id")): #get playlist created by the user 
-            playlists_html += f'<li><a href="/playlist/{playlist.get("id")}">{playlist.get("name")}</a></li>'
+            playlists_html += f'<li><a href="{playlist_url}">{playlist.get("name")}</a></li>'
     playlists_html += '</ul>'
     result= f'''
     <!DOCTYPE html>
