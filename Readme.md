@@ -52,9 +52,18 @@ The primary goal of this project is to analyze the user's listening patterns and
      ```plaintext
      API_ID=your_spotify_client_id
      API_KEY=your_spotify_client_secret
-5. **Run the application:**
+     MONGODB_URI= your_mongodb_url_link
+
+5. **Follow spotify Developer insteuction**
+   replace the SPOTIPY_REDIRECT_URI with  https://localhost:8888/callback 
+   Also add it to your spotify dashbord
+6. **Remove the (.) from from .db_operations**
+   from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs
+
+   
+7. **Run the application:**
    ```plaintext
-      python auth.py
+      python auth.py 
   
   The application will be accessible at http://localhost:5000.
 
