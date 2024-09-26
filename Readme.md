@@ -4,21 +4,38 @@
 This project is a Flask-based web application that integrates with the Spotify API to allow users to authenticate via OAuth, view their Spotify profile, access their playlists, and track their recently played songs. The app is designed with a focus on user experience, providing a seamless and interactive interface using HTML, CSS, and JavaScript.
 
 ## Goal
-The primary goal of this project is to analyze the user's listening patterns and create personalized playlists based on their listening activity. The project is still in the early stages of development and will be updated periodically as new features are added. Currently, the app is capable of fetching and displaying the user's recently played tracks.
+The primary goal of this project is to analyze the user's listening patterns and create personalized playlists based on their listening activity.  The app runs continuously, collecting user listening data and generating weekly  playlist updates. the app is also capable of fetching and displaying the user's recently played tracks.
 
 ## Features
 - **OAuth Authentication**: Users can securely log in to their Spotify account using the OAuth protocol.
 - **Profile Viewing**: Displays the user's Spotify profile information, including their playlists.
 - **Recently Played Tracks**: Fetches and stores the user's recently played tracks from Spotify, allowing them to view this data later.
 - **Interactive UI**: The application includes responsive design elements, loaders, and dynamic content updates for a smooth user experience.
+- **Playlist Creation and Updates**: Automatically generates and updates a personalized playlist based on the user's recent listening activity. Playlists are refreshed on a monthly basis.
 
 ## File Structure
-- **`auth.py`**: The core of the application, handling routes for user authentication, fetching user data, and interacting with the Spotify API.
-- **`db_operations.py`**: Contains functions for storing and retrieving recently played tracks from the database.
-- **`styles.css`**: Defines the visual style of the profile page, including layout, colors, and animations.
-- **`welcome.css`**: Styles the welcome page, focusing on user onboarding and login options.
-- **`.env`**: (Not included) A file to store sensitive information like the Spotify API client ID, client secret, and other environment variables.
+```plaintext
+.
+├── .env                     # Environment variables
+├── auth.py                  # Handles authentication and Spotify API interaction
+├── db_operations.py         # Handles database interactions
+├── __init__.py              # Initializes the Python package
+├── templates/               # Folder for HTML templates
+├── static/                  # Folder for static assets (CSS, JS, images)
+│   ├── frontpage.css        # CSS for front page
+│   ├── login.js             # JavaScript for login functionality
+│   ├── logo.svg             # SVG logo file
+│   ├── Profile.css          # CSS for profile page
+│   ├── profile.js           # JavaScript for profile page
+│   ├── script.js            # General JavaScript
+│   ├── stats.css            # CSS for stats page
+│   ├── styles.css           # Main CSS stylesheet
+│   ├── toptrack.css         # CSS for top track section
+│   ├── user-solid.svg       # SVG for user icon
+│   └── welcome.css          # CSS for welcome page
 
+
+```
 ## Setup Instructions
 1. **Clone the repository**:
    ```bash
@@ -56,9 +73,7 @@ The primary goal of this project is to analyze the user's listening patterns and
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-## Important note
-The Goal of the app is to run continuously while actively collecting the user listen and to create a montly playlist update based on the user activity.
-The project is still on going and will be updated frequently from time to time.
+
 ## Acknowledgements
 - Spotify API for providing the music data.
 - Flask documentation for guidance on building web applications.

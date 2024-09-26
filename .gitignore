@@ -9,3 +9,5 @@ spotify_auth_app/myenv
 spotify_auth_app/venv
 flask_session
 tests/__pycache__
+spotify_auth_app/file_structure.txt
+file_structure.txt
