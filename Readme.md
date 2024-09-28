@@ -54,7 +54,7 @@ The primary goal of this project is to analyze the user's listening patterns and
      API_KEY=your_spotify_client_secret
      MONGODB_URI= your_mongodb_url_link
 
-5. **Follow spotify Developer insteuction**
+5. **Follow spotify Developer instruction**
    replace the SPOTIPY_REDIRECT_URI with  https://localhost:8888/callback 
    Also add it to your spotify dashbord
 6. **Remove the (.) from from .db_operations**
