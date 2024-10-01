@@ -39,7 +39,7 @@ The primary goal of this project is to analyze the user's listening patterns and
 ## Setup Instructions
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/spotify-oauth-app.git
+   git clone https://github.com/fumnanya12/Playlist.git
 2. **Navigate to the project directory**:
    ```bash
    cd spotify-oauth-app
