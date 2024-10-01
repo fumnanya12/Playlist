@@ -72,6 +72,8 @@ The primary goal of this project is to analyze the user's listening patterns and
 2. Authorize the app to access your Spotify account.
 3. After successful login, you will be redirected to the profile page where you can view your playlists.
 4. You can also generate and view a list of your recently played tracks.
+5. You can provide permission for the app to listen to your actuvity and create a playlist weekly 
+6. You can choose to stop giving permission 
 
 ## Dependencies
 - **Flask**: Web framework used to build the application.
