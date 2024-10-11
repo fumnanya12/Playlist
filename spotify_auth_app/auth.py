@@ -763,7 +763,7 @@ def delete_song_from_playlist(current_user):
                 return None
                 
             print("user playlist id: ", user_playlistid)
-            song_list = delete_old_songs(current_user_name)
+            song_list = None #delete_old_songs(current_user_name)
              # Break early if song_list is None or empty
             if not song_list:
                 print(f"No songs found for deletion in playlist '{user_playlistid}'.")
