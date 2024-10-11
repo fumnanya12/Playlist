@@ -260,8 +260,8 @@ def delete_old_songs(user_name):
         {
             "$group": {  # Group by song name and song_id
                 "_id": {
-                    "song_name": "$song_name",
-                    "song_id": "$song_id"
+                    "song_name": "$Song_name",
+                    "song_id": "$Song_id"
                 },
                
             }
