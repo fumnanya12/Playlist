@@ -250,10 +250,11 @@ def delete_old_songs(user_name):
         raise Exception(f"Collection for user {user_name} does not exist.")
     # Calculate the date 1 month ago
     one_month_ago = datetime.now() - timedelta(days=30)
+    print(one_month_ago)
     pipeline = [
         {
             "$match": {  # Match songs where the play_date is greater than 2 days ago
-                "Date added": {"$gte": one_month_ago}
+                "Date added": {"$lte": one_month_ago}
             }
         },
         {
