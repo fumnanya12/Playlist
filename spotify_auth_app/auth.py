@@ -738,8 +738,9 @@ def delete_song_from_all_users(current_user):
     limit = 50  # Number of playlists to retrieve per request
     offset = 0  # Starting point for each request
     playlists=[]
+    url=
     while True:
-        playlists_response = requests.get(f'https://api.spotify.com/v1/me/playlists/{user_playlistid}/tracks', headers=headers ,
+        playlists_response = requests.get(f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks', headers=headers ,
                                 params={'limit': limit, 'offset': offset} )
         if playlists_response.status_code != 200:
                 print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
