@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs
+from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs, check_song_from_playlist
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from pytz import timezone
@@ -725,17 +725,95 @@ def add_song_to_playlist(current_user):
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
+def delete_song_from_all_users(current_user):
+    access_token = get_access_token(current_user)
+    print("create playlist token: ", access_token)
+    if not access_token:
+        return None
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    user_playlistid = get_user_playlistid(current_user)
+
+    # Spotify API paginates playlists, so we may need to retrieve them in multiple requests
+    limit = 50  # Number of playlists to retrieve per request
+    offset = 0  # Starting point for each request
+    playlists=[]
+    while True:
+        playlists_response = requests.get(f'https://api.spotify.com/v1/me/playlists/{user_playlistid}/tracks', headers=headers ,
+                                params={'limit': limit, 'offset': offset} )
+        if playlists_response.status_code != 200:
+                print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
+                return
+        data = playlists_response.json()
+        playlists.extend(data['items'])
+    
+        
+        
+        # If there are no more playlists to fetch, break the loop
+        if len(playlists) < limit:
+            break
+        
+        # Increment the offset to get the next set of playlists
+        offset += limit
+    
+    delete_track=[]
+    for playlist in playlists:
+        song_id=playlist['track']['id']
+        if check_song_from_playlist(current_user,song_id) is False:
+            delete_track.append(song_id)
+            print("delete track: ",playlist['track']['name'])
+
+
+
+
+    if len(delete_track) > 0:
+        for song_id in delete_track:
+            print("delete track: ",song_id)
+            delete_song_data = {
+                        "tracks": [{"uri": f"spotify:track:{song_id}"}]
+                    }
+
+            print("sending request to delete song from spotify")
+            delete_song_response = requests.delete(
+                f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
+                headers=headers,
+                json=delete_song_data
+            )
+
+            if delete_song_response.status_code != 200:
+                print(f"Failed to delete track from playlist: {delete_song_response.status_code}, {delete_song_response.text}")
+            else:
+                print(f"Track '{song_id}' removed from playlist '{user_playlistid}' successfully.")
+    else:
+        print("no track to delete from playlist for: ",current_user)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def adding_song_to_all_users():
     User_data= get_all_users()
     print("-------------------------------------------------------------------------------------------------------------------")
     for user in User_data:
         user_name= user['user_id']
-        print('DELETING song for: ',user_name)
-        delete_song_from_playlist(user_name)
-        print('Adding song for: ',user_name)
+        print('Deleting song for: ',user_name)
+        delete_song_from_all_users(user_name)
+        #print('DELETING song for: ',user_name)
+        #delete_song_from_playlist(user_name)
+        #print('Adding song for: ',user_name)
         #add_song_to_playlist(user_name)
        
-        print("Adding song job done for ",user_name)
+        #print("Adding song job done for ",user_name)
       
     print("-------------------------------------------------------------------------------------------------------------------")       
 
@@ -763,8 +841,8 @@ def delete_song_from_playlist(current_user):
                 return None
                 
             print("user playlist id: ", user_playlistid)
-            delete_old_songs(current_user_name)
-            song_list = None #delete_old_songs(current_user_name)
+            
+            song_list = delete_old_songs(current_user_name)
              # Break early if song_list is None or empty
             if not song_list:
                 print(f"No songs found for deletion in playlist '{user_playlistid}'.")
@@ -1348,13 +1426,12 @@ scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 winnipeg_tz = timezone('America/Winnipeg')
 
 scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=5, timezone=winnipeg_tz)
-adding_song_to_all_users()
 
 # Start the scheduler
 start_scheduler()
 
 
-
+adding_song_to_all_users()
 
 
 if __name__ == '__main__':

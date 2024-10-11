@@ -333,6 +333,17 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
         update= True
 
     return update
+#remove song from playlist
+def check_song_from_playlist(user_name,song_id):
+    playlist_name = user_name + "_playlist"
+    playlist_collection = db[playlist_name]
+    playlist = playlist_collection.find_one({'Song_id': song_id})
+    if playlist:
+        print(f"Song with ID {song_id} already exists in the playlist.")
+        return True
+    else:
+        print(f"Song with ID {song_id} does not exist in the playlist.")
+        return False
 
 def get_all_recent_plays(user_name):
     plays_collection = db[user_name]
