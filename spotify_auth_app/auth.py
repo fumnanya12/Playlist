@@ -192,7 +192,6 @@ def callback():
     print("User information retrieved successfully. callback method")
     # Store access token in a global variable
    
- 
     
     # Redirect to the welcome page
     session['user'] = user_name
@@ -498,6 +497,7 @@ def recently_played():
 "Profile "
 @app.route('/user_profile')
 def user_profile():
+    
     current_user=session.get('user')
     access_token = get_access_token(current_user)
     if not access_token:
@@ -508,6 +508,8 @@ def user_profile():
     current_user_name= profile_json.get("display_name")
     current_user_email= profile_json.get("email")
     current_user_img= profile_json.get("images")
+
+
     if current_user_img:
         img_url = current_user_img[0].get("url")
     else:
@@ -728,9 +730,10 @@ def adding_song_to_all_users():
     print("-------------------------------------------------------------------------------------------------------------------")
     for user in User_data:
         user_name= user['user_id']
-        print('Adding song for: ',user_name)
+        print('DELETING song for: ',user_name)
         delete_song_from_playlist(user_name)
-        add_song_to_playlist(user_name)
+        print('Adding song for: ',user_name)
+        #add_song_to_playlist(user_name)
        
         print("Adding song job done for ",user_name)
       
@@ -1344,10 +1347,10 @@ scheduler.add_job(func=store_all_users_plays, trigger="interval", minutes=25)
 winnipeg_tz = timezone('America/Winnipeg')
 
 scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fri', hour=0, minute=5, timezone=winnipeg_tz)
+adding_song_to_all_users()
 
 # Start the scheduler
 start_scheduler()
-
 
 
 
