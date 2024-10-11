@@ -726,6 +726,11 @@ def add_song_to_playlist(current_user):
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
 
 def delete_song_from_all_users(current_user):
+    """
+    Deletes all songs from the user's playlist except the ones that are already in the database.
+
+    :param current_user: The user_id of the user whose playlist we want to update
+    """
     access_token = get_access_token(current_user)
     print("create playlist token: ", access_token)
     if not access_token:
@@ -738,6 +743,8 @@ def delete_song_from_all_users(current_user):
     limit = 50  # Number of playlists to retrieve per request
     offset = 0  # Starting point for each request
     playlists=[]
+
+    # Loop until we have retrieved all playlists
     while True:
         playlists_response = requests.get(f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks', headers=headers ,
                                 params={'limit': limit, 'offset': offset} )
@@ -747,8 +754,6 @@ def delete_song_from_all_users(current_user):
         data = playlists_response.json()
         playlists.extend(data['items'])
     
-        
-        
         # If there are no more playlists to fetch, break the loop
         if len(playlists) < limit:
             break
@@ -762,10 +767,7 @@ def delete_song_from_all_users(current_user):
         if check_song_from_playlist(current_user,song_id) is False:
             delete_track.append(song_id)
             print("delete track: ",playlist['track']['name'])
-
-
-
-
+    
     if len(delete_track) > 0:
         for song_id in delete_track:
             print("delete track: ",song_id)
@@ -807,13 +809,13 @@ def adding_song_to_all_users():
     for user in User_data:
         user_name= user['user_id']
         print('Deleting song for: ',user_name)
-        delete_song_from_all_users(user_name)
-        #print('DELETING song for: ',user_name)
-        #delete_song_from_playlist(user_name)
-        #print('Adding song for: ',user_name)
-        #add_song_to_playlist(user_name)
+        #delete_song_from_all_users(user_name)
+        print('DELETING song for: ',user_name)
+        delete_song_from_playlist(user_name)
+        print('Adding song for: ',user_name)
+        add_song_to_playlist(user_name)
        
-        #print("Adding song job done for ",user_name)
+        print("Adding song job done for ",user_name)
       
     print("-------------------------------------------------------------------------------------------------------------------")       
 
@@ -1431,7 +1433,6 @@ scheduler.add_job(func=adding_song_to_all_users, trigger='cron', day_of_week='fr
 start_scheduler()
 
 
-adding_song_to_all_users()
 
 
 if __name__ == '__main__':

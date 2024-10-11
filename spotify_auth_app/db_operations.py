@@ -335,6 +335,15 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
     return update
 #remove song from playlist
 def check_song_from_playlist(user_name,song_id):
+    """ Checks if a song with the given song_id already exists in the playlist of the given user.
+
+    Args:
+        user_name (str): The name of the user.
+        song_id (str): The ID of the song to check.
+
+    Returns:
+        bool: True if the song exists in the playlist, False otherwise.
+    """
     playlist_name = user_name + "_playlist"
     playlist_collection = db[playlist_name]
     playlist = playlist_collection.find_one({'Song_id': song_id})
