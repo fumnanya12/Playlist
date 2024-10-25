@@ -1,0 +1,448 @@
+/* Base styles */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #f4f4f4;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    --size: 82px;
+    --color1: #b2b2b2;
+    --color2: #ffffff;
+    --color3: #d9d9d9;
+
+    --gradient: var(--color3) 0 120deg, transparent 0;
+    background: conic-gradient(from -60deg at 50% calc(100% / 3), var(--gradient)),
+                conic-gradient(from 120deg at 50% calc(200% / 3), var(--gradient)),
+                conic-gradient(from 60deg at calc(200% / 3), var(--color3) 60deg, var(--color2) 0 120deg, transparent 0),
+                conic-gradient(from 180deg at calc(100% / 3), var(--color1) 60deg, var(--gradient)),
+                linear-gradient(90deg, var(--color1) calc(100% / 6), var(--color2) 0 50%, var(--color1) 0 calc(500% / 6), var(--color2) 0);
+    background-size: calc(1.732 * var(--size)) var(--size);
+}
+
+/* Navbar styles */
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #149611;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    width: 99.5%;
+    position: absolute;
+    top: 50%;    
+}
+
+.logo {
+    flex-shrink: 0; /* Prevent the logo from shrinking */
+    margin-right: 20px; /* Add some space between the logo and the nav links */
+}
+
+.logo img {
+    height: 50px; /* Adjust the height of the logo */
+    width: auto; /* Maintain the aspect ratio of the logo */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0 20px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.nav-links li a:hover {
+    color: #000000;
+}
+
+/* Content styles */
+.content {
+    display: none;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+    border-radius: 2px;
+
+}
+
+/* Loader styles */
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1DB954;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Back button */
+/* From Uiverse.io by BHARGAVPATEL1244 */ 
+.logout-button {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: inherit;
+    font-size: inherit;
+    position: absolute;
+    top: 10px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+   }
+   
+   .logout-button span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+   }
+   
+   .logout-button:hover span {
+    color: black;
+   }
+   
+   .logout-button::before,
+   .logout-button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .logout-button::before {
+    content: "";
+    background: #000;
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .logout-button:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+
+/* Styling for modal */
+
+  
+  .modal-content {
+    display: none;
+    background-color: white;
+    padding: 70px;
+    border-radius: 10px;
+    width:800px;
+    height: 500px;
+    overflow: auto;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 5px solid green;
+    
+  }
+
+ 
+  .modal-content h2 {
+    position: absolute;
+    top: 1%;
+    left: 40%;
+    font-size: 30px;
+    margin: 0;
+
+  }
+  .New-admin{
+    border-collapse: collapse;
+    top : 20%;
+    left: 0%;
+    position: absolute;
+    
+  }
+
+  .New-admin td {
+   
+    text-align: left; /* Center align the content in the table cell */
+}
+.New-admin th:nth-child(2) {
+    text-align: left;
+    padding-left: 120px;
+}
+.New-admin td:nth-child(2) {
+    text-align: left;
+    padding-left: 100px;
+}
+
+.New-admin p {
+    font-size: 20px;
+    
+}
+
+
+
+.New-admin button:hover {
+    background-color: #2fb617;
+    color: #fff;
+}
+
+   
+
+
+
+/* From Uiverse.io by Admin12121 */ 
+.switch-button {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    justify-content: center;
+    margin: auto;
+    height: 45px;
+  }
+  
+  .switch-button .switch-outer {
+    height: 80%;
+    background: #252532;
+    width: 105px;
+    border-radius: 165px;
+    -webkit-box-shadow: inset 0px 5px 10px 0px #16151c, 0px 3px 6px -2px #403f4e;
+    box-shadow: inset 0px 5px 10px 0px #16151c, 0px 3px 6px -2px #403f4e;
+    border: 1px solid #32303e;
+    padding: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .switch-button .switch-outer input[type="checkbox"] {
+    opacity: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: absolute;
+  }
+  
+  .switch-button .switch-outer .button-toggle {
+    height:22px;
+    width: 22px;
+    background: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      from(#3b3a4e),
+      to(#272733)
+    );
+    background: -o-linear-gradient(#3b3a4e, #272733);
+    background: linear-gradient(#3b3a4e, #272733);
+    border-radius: 100%;
+    -webkit-box-shadow: inset 0px 5px 4px 0px #424151, 0px 4px 15px 0px #0f0e17;
+    box-shadow: inset 0px 5px 4px 0px #424151, 0px 4px 15px 0px #0f0e17;
+    position: relative;
+    z-index: 2;
+    -webkit-transition: left 0.3s ease-in;
+    -o-transition: left 0.3s ease-in;
+    transition: left 0.3s ease-in;
+    left: 0;
+  }
+  
+  .switch-button
+    .switch-outer
+    input[type="checkbox"]:checked
+    + .button
+    .button-toggle {
+    left: 58%;
+  }
+  
+  .switch-button
+    .switch-outer
+    input[type="checkbox"]:checked
+    + .button
+    .button-indicator {
+    -webkit-animation: indicator 1s forwards;
+    animation: indicator 1s forwards;
+  }
+  
+  .switch-button .switch-outer .button {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+  }
+  
+  .switch-button .switch-outer .button-indicator {
+    height: 25px;
+    width: 25px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    border-radius: 50%;
+    border: 3px solid #ef565f;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    right: 10px;
+    position: relative;
+  }
+  
+  @-webkit-keyframes indicator {
+    30% {
+      opacity: 0;
+    }
+  
+    0% {
+      opacity: 1;
+    }
+  
+    100% {
+      opacity: 1;
+      border: 3px solid #60d480;
+      left: -68%;
+    }
+  }
+  
+  @keyframes indicator {
+    30% {
+      opacity: 0;
+    }
+  
+    0% {
+      opacity: 1;
+    }
+  
+    100% {
+      opacity: 1;
+      border: 3px solid #60d480;
+      left: -68%;
+    }
+  }
+
+     /* Mobile styles */
+   /* Responsive Styles */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 5px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.logo {
+    margin-right: 10px;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.nav-links {
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.nav-links li {
+    margin: 5px 5px;
+}
+
+.nav-links li a {
+    font-size: 14px;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+}
+.New-admin button {
+  font-size: 12px; /* Adjust button font size */
+  padding: 8px 15px; /* Adjust button padding */
+}
+
+.logout-button {
+  top: 5px;
+  right: 10px;
+  padding: 0.7rem 1.5rem;
+  font-size: 10px;
+}
+.modal-content {
+  width: 90%; /* Reduce modal width on smaller screens */
+  height: 40%; /* Let modal height adjust based on content */
+  padding: 20px; /* Reduce padding for smaller screens */
+}
+
+.modal-content h2 {
+  left: 20%; /* Adjust title positioning */
+  font-size: 24px; /* Adjust font size for smaller screens */
+}
+.New-admin{
+  left: 25%;
+}
+.New-admin th:nth-child(2),
+.New-admin td:nth-child(2) {
+  padding-left: 20px; /* Reduce padding for smaller screens */
+}
+
+.New-admin p {
+  font-size: 16px; /* Adjust paragraph font size */
+}
+
+.switch-button .switch-outer {
+  width: 80px; /* Reduce switch width */
+}
+
+.switch-button .switch-outer .button-toggle {
+  height: 15px; /* Reduce toggle size */
+  width: 15px;
+}
+
+.switch-button .switch-outer input[type="checkbox"]:checked + .button .button-toggle {
+  left: 50%; /* Adjust toggle position */
+}
+}

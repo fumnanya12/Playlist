@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Pre-select the option based on the user's previous response
     const userResponse = document.getElementById('permission-response').getAttribute('data-response');  // Response passed from Flask (Yes/No)
+    console.log(userResponse);
     if (userResponse === 'Yes') {
         yesButton.style.backgroundColor = 'green';  // Highlight Yes button
     } else if (userResponse === 'No') {
@@ -44,7 +45,10 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Response saved:', data.response);
         })
         .catch((error) => {
-            console.error('Error:', error);
+            console.error('Error updating permission:', error);
+        return response.text().then(text => {
+            console.log('Response received:', text);
+        });
         });
     }
 

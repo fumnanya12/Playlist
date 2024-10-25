@@ -1,0 +1,140 @@
+/* styles.css */
+
+/* General page styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    height: 100vh; /* Full height to center vertically */
+    margin: 0; /* Remove default margin */
+    position: relative; /* Set body as a relative container */
+ 
+}
+/* Centering the content using absolute positioning and transforms */
+h2{
+    position: absolute;
+    top: 20%;  /* Moves the element to the middle vertically */
+    left: 50%; /* Moves the element to the middle horizontally */
+    transform: translate(-50%, -50%); /* Centers the element by adjusting its own size */
+}
+
+h2 {
+    color: #360606;
+    margin-bottom: 20px;
+}
+
+/* Form container */
+form {
+    background-color: #fff;
+    padding: 20px;
+    position: relative;
+    top: 50%; 
+    left: 50%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    transform: translate(-50%, -50%); /* Centers the element by adjusting its own size */
+}
+
+
+/* Input fields styling */
+label {
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Button styling */
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+/* Form container */
+.form-container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto; /* Centers the form-container horizontally */
+    top: 20%;
+}
+/* Flash message styling */
+ul.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px; /* Adds space between the form and the flash message */
+    width: 100%; /* Ensures the flash message aligns with the form */
+}
+
+li.flash-message {
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+li.success {
+    background-color: #28a745;
+}
+
+li.danger {
+    background-color: #dc3545;
+}
+
+
+
+/* Responsive design for smaller screens */
+/* Media queries for responsiveness */
+@media (max-width: 600px) {
+    h2 {
+        font-size: 20px;
+        top: 5%; /* Adjust for smaller screens */
+    }
+    
+    form {
+        width: 90%; /* Make form take up more width on smaller screens */
+        padding: 15px;
+    }
+    
+    input[type="text"],
+    input[type="password"] {
+        font-size: 14px; /* Reduce font size on inputs for small screens */
+    }
+
+    button {
+        font-size: 14px; /* Adjust button size for smaller screens */
+        padding: 8px;
+    }
+
+    .flash-messages {
+        font-size: 14px; /* Adjust flash message text size for smaller screens */
+    }
+}

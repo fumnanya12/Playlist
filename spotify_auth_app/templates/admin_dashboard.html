@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='Admin_stats.css')}}">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+    <div class="container">
+  
+
+        <div class="loader" id="loader"></div>
+        <div class="content" id="content">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="{{url_for('static', filename='logo.svg')}}" alt="Logo">
+                </div>
+                <a href="{{ url_for('admin_logout') }}">
+                <button class="logout-button"> <span>Logout</span>
+                </button> </a>
+                <ul class="nav-links">
+                    <li ><a href=#>Dashboard</a></li>
+                    <li><a href="{{ url_for('admin_report') }}">Report</a></li>
+                    <li><a href="{{ url_for('admin_access') }}">Access Control</a></li>
+                </ul>
+            </nav>
+            
+        </div>    
+
+            
+        <div class="modal-content" id="Modal-content">
+            <h2 >Welcome, {{ session['admin_username'] }}!</h2>
+             <table class="New-admin">
+                <tr>
+                    <td>
+                        <p>Register Admins
+                        </p>
+                    </td>
+                    <td>
+                    <a href="{{ url_for('admin_register') }}">
+                        <button >Register</button>
+                    </a>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <p>Users
+                        
+                    </p>
+                </td>
+                    <td>
+                    <a href="#">
+                        <button class="new-button">User list</button>
+                    </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+       
+        
+       
+    </div>
+    <!-- Loader -->
+    <script src="{{url_for('static', filename='Admin_script.js')}}"></script>
+
+</body>
+</html>

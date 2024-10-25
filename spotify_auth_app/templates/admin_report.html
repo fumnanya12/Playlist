@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='Admin_stats.css')}}">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+    <div class="container" id="container">
+  
+
+        <div class="loader" id="loader"></div>
+        <div class="content" id="content">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="{{url_for('static', filename='logo.svg')}}" alt="Logo">
+                </div>
+                <a href="{{ url_for('admin_logout') }}">
+                <button class="logout-button"> <span>Logout</span>
+                </button> </a>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li><a href="#">Report</a></li>
+                    <li><a href="{{ url_for('admin_access') }}">Access Control</a></li>
+                </ul>
+            </nav>
+            
+           
+
+
+        </div>    
+        <div class="Report" id="Report">
+            <h1>Report</h1>
+            <table id="user_report">
+                <tr>
+                    <th>No</th>
+                    <th>Username</th>
+                    <th>Report</th>
+                    <th>Date</th>
+                </tr>
+                {{report_list|safe}}
+            </table>
+             
+        </div>
+       
+
+        
+       
+    </div>
+    <!-- Loader -->
+    <script src="{{url_for('static', filename='admin_report.js')}}"></script>
+
+</body>
+</html>

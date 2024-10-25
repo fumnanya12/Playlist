@@ -123,41 +123,27 @@ def get_all_users():
     users_collection = db['users']
     all_users = users_collection.find()
     return all_users
-#method to add artist name can modify and use to change other data 
-def add_artist_name(song_id,artist_name,user_name):
-    song_list= db[user_name]
-    new_data = {"artist_name": artist_name}
-    result = song_list.update_one(
-            {"song_id":song_id },  # Find the document by its _id
-            {"$set": new_data}         # Add the new field to the document
-            )
-    # Step 6: Check if the update was successful
-    if result.matched_count > 0:
-        print(f"Document with _id {song_id} updated successfully.")
-    else:
-        print(f"No document found with _id {song_id}.")
 
-def check_for_playlist(user_name,playlist_id):
-    playlistname = user_name + "_playlist"
-    user=db['users']
-    current_user = user.find_one({'user_id': user_name})
-    if str(current_user['permissions']).lower().strip() == 'yes':
-        playlist_collection = db[playlistname]
-        playlist = playlist_collection.find_one({'playlist_id': playlist_id})
+
+def check_for_playlist(user_name, playlist_id):
+    """Checks if a playlist with the given ID already exists for the given user."""
+    playlist_collection_name = f"{user_name}_playlist"
+    playlist_collection = db[playlist_collection_name]
+
+    current_user = db["users"].find_one({"user_id": user_name})
+    if current_user and current_user["permissions"].lower().strip() == "yes":
+        playlist = playlist_collection.find_one({"playlist_id": playlist_id})
         if playlist:
-            print(f"Playlist with ID {playlist_id} already exists.")
+            print(f"Playlist with ID {playlist_id} already exists for user {user_name}.")
         else:
-            new_data = {"playlist_id": playlist_id}
-            result = user.update_one(
-                    {"user_id":user_name },  # Find the document by its _id
-                    {"$set": new_data}         # Add the new field to the document
-                    )
-            # Step 6: Check if the update was successful
-            if result.matched_count > 0:
-                print(f"Document with _id {user_name} updated successfully.")
-                #print(playlist_collection.count_documents())
+            update_result = db["users"].update_one(
+                {"user_id": user_name},
+                {"$set": {"playlist_id": playlist_id}},
+            )
+            if update_result.matched_count > 0:
+                print(f"Updated user {user_name} with playlist ID {playlist_id}.")
             else:
-                print(f"No document found with _id {user_name}.")
+                print(f"No user found with user_id {user_name}.")
 
 from datetime import datetime, timedelta
 
@@ -404,14 +390,49 @@ ADmin Login
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 '''
-# Fetch admin user by username
+# MongoDB connection setup
+try:
+    mongo_uri = os.getenv('MONGODB_URI')
+    client = pymongo.MongoClient( mongo_uri)
+    Admin_db = client['admin_db']
+   # plays_collection = db['recent_plays']
+except pymongo.errors.ConnectionError as e:
+    print(f"Could not connect to MongoDB: {e}")
+
+
 def get_admin_user(username):
     """Fetches the admin user from the MongoDB collection."""
-    admincollection = db["admins"]
-    return admincollection.find_one({"username": username})
+    try:
+            admincollection =  Admin_db["admins"]
+            admin_user = admincollection.find_one({"username": username})
+
+            if admin_user:
+                print("Admin user found:")
+            else:
+                print("Admin user not found!")
+    except Exception as e:
+            print("Error fetching admin user:", e)
+    return admin_user
 
 # Store a new admin user
 def store_admin_user(admin_data):
     """Stores the admin user in the MongoDB collection."""
-    admincollection = db["admins"]
-    db.admins.insert_one(admin_data)
+    admincollection =  Admin_db["admins"]
+    Admin_db.admins.insert_one(admin_data)
+
+def store_log_details(user_name,details):
+    """Stores the login details in the MongoDB collection."""
+    plays_collection = Admin_db["log_details"]
+    Date = datetime.now().strftime("%Y-%m-%d")
+    Time = (datetime.now().astimezone(pytz.timezone('America/Winnipeg'))).strftime("%H:%M:%S")
+    plays_collection.insert_one({
+        'User_name': user_name,
+        'Date': Date,
+        'Time': Time,
+        'Details': details
+    })
+def get_log_details():
+    """Fetches all the login details from the MongoDB collection."""
+    plays_collection = Admin_db["log_details"]
+    log_details = plays_collection.find()
+    return log_details

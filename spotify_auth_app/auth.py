@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, request, session, url_for,render_template
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play, get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs, check_song_from_playlist
+from db_operations import store_recent_play,get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs, check_song_from_playlist, get_admin_user,store_admin_user, store_log_details,get_log_details
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from pytz import timezone
@@ -25,7 +25,9 @@ scheduler = BackgroundScheduler()
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
+#SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
+SPOTIPY_REDIRECT_URI = 'http://localhost:5000/callback'
+
 
 # Spotify authorization URL
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -136,6 +138,7 @@ def logout():
     # Optionally, add a logout message
     print('You have been logged out.', 'info')
     print(user_name,"User logged out")
+    store_log_details(user_name,'User logged out')
 
     # Redirect to the login page or home page
     return redirect(url_for('index'))
@@ -166,6 +169,7 @@ def callback():
 
     if not access_token:
         print('Failed to retrieve access token.')
+        store_log_details(user_name,'Failed to retrieve access token.')
         return redirect(url_for('login'))
 
 
@@ -195,14 +199,35 @@ def callback():
     
     # Redirect to the welcome page
     session['user'] = user_name
+    store_log_details(user_name,'User logged in')
 
 
     return redirect(url_for('welcome'))
 @app.route('/submit_permission', methods=['POST'])
 def submit_permission():
-    data = request.json
-    update_user_permissions(user_name,data['response'])
-    return 
+    try:
+        user_name = session.get('user')
+        if session.get('admin_logged_in'):
+            data = request.json
+            user_name = data['user_name']
+            print(user_name)
+            response = 'Yes' if data['response'] else 'no'  # Convert boolean to string
+
+            # Update user permissions
+            update_user_permissions(user_name, response)
+
+            # Log the detail
+            detail = f"Permission updated: {response}"
+            store_log_details(user_name, detail)
+        else:
+            data = request.json
+            update_user_permissions(user_name,data['response'])
+            detail="Permission updated: "+data['response']
+            store_log_details(user_name,detail)
+        return jsonify({'status': response})  
+    except Exception as e:
+        print(e)
+        return jsonify({'status': str(e)}), 500
 "Welcome Page"
 @app.route('/welcome')
 def welcome():
@@ -243,6 +268,11 @@ def welcome():
             <a href="/logout">
             <button> <span>Logout</span>
             </button> </a>
+            <div class="Admin">
+            <a href="{url_for('admin_login')}">
+            <p> Admin</p>
+            </a>
+            </div>
             <ul class="nav-links">
                  <li id="openModal" ><a href=#>Profile</a></li>
                 <li class="center"><a href="/playlist">Playlists</a></li>
@@ -648,6 +678,7 @@ def create_playlist(current_user):
         playlist_data = create_playlist_response.json()
         playlist_id = playlist_data['id']
         print(f"Playlist '{playlist_name}' created successfully with ID: {playlist_id}")
+        store_log_details(current_user,f"Playlist '{playlist_name}' created successfully with ID: {playlist_id}")
     return playlist_id
 
 
@@ -1121,6 +1152,7 @@ def top_artists():
 @app.route('/top_tracks')
 def top_tracks():
     current_user=session.get('user')
+    print(current_user)
     access_token = get_access_token(current_user)
     time_range = request.args.get('time_range', 'short_term')  # Default to 'medium_term' if not specified
     date='Last 4 Weeks'
@@ -1359,7 +1391,10 @@ ADmin Login
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Admin Authentication
+
+    
+'''
+
 def hash_password(password):
     """Generates a hash for the given password."""
     return generate_password_hash(password)
@@ -1375,14 +1410,21 @@ def register_admin(username, password):
         'username': username,
         'password': hashed_password
     }
-    store_admin_user(admin_data)
+    store_admin_user(admin_data)  # This should store the admin details in the database
+    print('Admin registered successfully!')
+   
 
 def authenticate_admin(username, password):
     """Authenticate admin by checking username and password."""
-    admin_user = get_admin_user(username)
+    admin_user = get_admin_user(username)  # Retrieve admin user data from the database
+   
     if admin_user and verify_password(admin_user['password'], password):
+        print('Admin authenticated successfully!')
         return True
+    else:
+        print('Admin authentication failed!')
     return False
+
 # Admin login route
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -1395,15 +1437,109 @@ def admin_login():
             session['admin_username'] = username
             return redirect(url_for('admin_dashboard'))
         else:
-            print('Invalid credentials. Please try again.', 'danger')
-    
-    
+            flash('Invalid credentials. Please try again.', 'danger')
 
-    print("Welcome page")
+    return render_template('admin_login.html')
+
+# Admin dashboard route
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    return render_template('admin_dashboard.html')
+
+# Admin logout route
+@app.route('/admin/logout')
+def admin_logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('admin_login'))
+
+# Admin report route
+@app.route('/admin/report')
+def admin_report():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+   
+
+   
+    report_list= get_log_details()
+    report_html=''
+    index=0
+    for i in report_list:
+        report_html+=f"<tr><td>{index+1}</td><td>{i['User_name']}</td><td>{i['Details']}</td><td>{i['Date']} {i['Time']}</td></tr>"
+        index+=1
+    return render_template('admin_report.html',report_list=report_html)
+@app.route('/get_permission_status/<user_name>', methods=['GET'])
+def get_permission_status(user_name):
+    try:
+        # Fetch the last permission status for the user
+        user_acess_token, user_refresh_token, token_expiry, user_permission, user_email = get_user_access_token(user_name)
+        switchid = request.args.get('switchid')  # Get switchid from query params
+
+        return jsonify({'user_name': user_name, 'user_permission': user_permission ,'switchid':switchid }), 200
+    except Exception as e:
+        print(f'Error fetching permission: {e}')
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+# Admin registration route (optional, you can disable this in production)
+@app.route('/admin/Access')
+def admin_access():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    User_data= get_all_users()
     
-'''
+    playlist_html=''
+    count=1
+    for user in User_data:
+        user_name= user['user_id']
+        switch_id = f'switch{count}'
+        get_permission_status(user_name)
+        playlist_html+=f'''<tr>
+                    <td>
+                        <p>
+                        {user_name}
+                        
+                        </p>
+                    </td>
+                    <td>
+                        <label class="switch-button" for="{switch_id }">
+                            <div class="switch-outer">
+                              <input id="switch{count}" type="checkbox" 
+                                onchange="updatePermission('{user_name}', this.checked)">
+                              <div class="button">
+                                <span class="button-toggle"></span>
+                                <span class="button-indicator"></span>
+                              </div>
+                            </div>
+                          </label>
+                    </td>
+                    
+                </tr>
+                '''
+        print(f"<u{user_name}: switch{count}>)")
+        count+=1
+
+    return render_template('admin_access.html',playlist_html=playlist_html)
 
 
+
+
+
+@app.route('/admin/register', methods=['GET', 'POST'])
+def admin_register():
+     # Ensure the user is logged in and an admin
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        register_admin(username, password)
+        flash('Admin registered successfully!', 'success')
+        return redirect(url_for('admin_login'))
+
+    return render_template('admin_register.html')
 
 
 

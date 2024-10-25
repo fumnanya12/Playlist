@@ -84,7 +84,14 @@ h1 {
   }
   
 
-
+.Admin p
+{
+  position: absolute;
+  top:50%;
+  left: 3.5%;
+  font-size: 8px;
+  color: #000000;
+}
 
 
 
