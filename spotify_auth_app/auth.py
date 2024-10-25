@@ -26,7 +26,9 @@ scheduler = BackgroundScheduler()
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 #SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
-SPOTIPY_REDIRECT_URI = 'http://localhost:5000/callback'
+#SPOTIPY_REDIRECT_URI = 'http://localhost:5000/callback'
+SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+
 
 
 # Spotify authorization URL
@@ -637,6 +639,7 @@ def create_playlist(current_user):
                                 params={'limit': limit, 'offset': offset} )
         if playlists_response.status_code != 200:
                 print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
+                store_log_details(current_user, f"failed to retrieve data, {playlists_response.status_code}, {playlists_response.text}")
                 return
     
         playlists_data = playlists_response.json()
@@ -701,9 +704,11 @@ def Playlist_all_users_plays(current_user):
         playlist_id=create_playlist(current_user)
         if playlist_id is None:
             print("Error creating playlist for ",current_user_name)
+            store_log_details(current_user,f"Error creating playlist for {current_user_name}")
         else:   
             check_for_playlist(current_user_name,playlist_id)
             print("creating playlist  done for ",current_user_name)
+            store_log_details(current_user,f"creating playlist  done for {current_user_name}")
     else:
         print("no permission to create playlist for: ",current_user_name)
 
@@ -735,6 +740,7 @@ def add_song_to_playlist(current_user):
             song_list=get_playlist_tracks(current_user_name,user_playlistid)
             for song in song_list:
                 song_id=song['_id']['song_id']
+                song_name = song['_id']['song_name'] 
                 add_song_data = {
             "uris": [f"spotify:track:{song_id}"]
             }
@@ -746,8 +752,11 @@ def add_song_to_playlist(current_user):
                 ) 
                 if add_song_response.status_code != 201:
                     print(f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
+                    store_log_details(current_user_name,f"Failed to add tracks to playlist: {add_song_response.status_code}, {add_song_response.text}")
                 else:
                     print(f"Tracks added to playlist '{user_playlistid}' successfully.")
+                    store_log_details(current_user_name,f"Track '{song_name}' Added to playlist '{user_playlistid}' successfully." )
+
 
         else:
             print("no permission to add song to playlist for: ",current_user_name)
@@ -755,70 +764,6 @@ def add_song_to_playlist(current_user):
         print("add song to playlist error:",e)
 
     print("-------------------------------------------------------------------------------------------------------------------------------------------")
-
-def delete_song_from_all_users(current_user):
-    """
-    Deletes all songs from the user's playlist except the ones that are already in the database.
-
-    :param current_user: The user_id of the user whose playlist we want to update
-    """
-    access_token = get_access_token(current_user)
-    print("create playlist token: ", access_token)
-    if not access_token:
-        return None
-    headers = {'Authorization': f'Bearer {access_token}'}
-
-    user_playlistid = get_user_playlistid(current_user)
-
-    # Spotify API paginates playlists, so we may need to retrieve them in multiple requests
-    limit = 50  # Number of playlists to retrieve per request
-    offset = 0  # Starting point for each request
-    playlists=[]
-
-    # Loop until we have retrieved all playlists
-    while True:
-        playlists_response = requests.get(f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks', headers=headers ,
-                                params={'limit': limit, 'offset': offset} )
-        if playlists_response.status_code != 200:
-                print(f'failed to retrieve data: {playlists_response.status_code}, {playlists_response.text}')
-                return
-        data = playlists_response.json()
-        playlists.extend(data['items'])
-    
-        # If there are no more playlists to fetch, break the loop
-        if len(playlists) < limit:
-            break
-        
-        # Increment the offset to get the next set of playlists
-        offset += limit
-    
-    delete_track=[]
-    for playlist in playlists:
-        song_id=playlist['track']['id']
-        if check_song_from_playlist(current_user,song_id) is False:
-            delete_track.append(song_id)
-            print("delete track: ",playlist['track']['name'])
-    
-    if len(delete_track) > 0:
-        for song_id in delete_track:
-            print("delete track: ",song_id)
-            delete_song_data = {
-                        "tracks": [{"uri": f"spotify:track:{song_id}"}]
-                    }
-
-            print("sending request to delete song from spotify")
-            delete_song_response = requests.delete(
-                f'https://api.spotify.com/v1/playlists/{user_playlistid}/tracks',
-                headers=headers,
-                json=delete_song_data
-            )
-
-            if delete_song_response.status_code != 200:
-                print(f"Failed to delete track from playlist: {delete_song_response.status_code}, {delete_song_response.text}")
-            else:
-                print(f"Track '{song_id}' removed from playlist '{user_playlistid}' successfully.")
-    else:
-        print("no track to delete from playlist for: ",current_user)
 
 
 
@@ -840,7 +785,6 @@ def adding_song_to_all_users():
     for user in User_data:
         user_name= user['user_id']
         print('Deleting song for: ',user_name)
-        #delete_song_from_all_users(user_name)
         print('DELETING song for: ',user_name)
         delete_song_from_playlist(user_name)
         print('Adding song for: ',user_name)
@@ -882,6 +826,7 @@ def delete_song_from_playlist(current_user):
                 return None
             for song in song_list:
                 song_id = song['_id']['song_id']
+                song_name = song['_id']['song_name'] 
                 
                 delete_song_data = {
                     "tracks": [{"uri": f"spotify:track:{song_id}"}]
@@ -898,6 +843,7 @@ def delete_song_from_playlist(current_user):
                     print(f"Failed to delete track from playlist: {delete_song_response.status_code}, {delete_song_response.text}")
                 else:
                     print(f"Track '{song_id}' removed from playlist '{user_playlistid}' successfully.")
+                    store_log_details(current_user_name,f"Track '{song_name}' removed from playlist '{user_playlistid}' successfully." )
         
         else:
             print(f"No permission to delete songs from playlist for: {current_user_name}")
@@ -1435,6 +1381,7 @@ def admin_login():
         if authenticate_admin(username, password):
             session['admin_logged_in'] = True
             session['admin_username'] = username
+            store_log_details(session['admin_username'], "Login")
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid credentials. Please try again.', 'danger')
@@ -1451,8 +1398,10 @@ def admin_dashboard():
 # Admin logout route
 @app.route('/admin/logout')
 def admin_logout():
-    session.clear()
     flash('You have been logged out.', 'info')
+    store_log_details(session['admin_username'], "Logout")
+    session.clear()
+
     return redirect(url_for('admin_login'))
 
 # Admin report route
@@ -1537,6 +1486,7 @@ def admin_register():
 
         register_admin(username, password)
         flash('Admin registered successfully!', 'success')
+        store_log_details(username, "Registered successfully as an admin")
         return redirect(url_for('admin_login'))
 
     return render_template('admin_register.html')
