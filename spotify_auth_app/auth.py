@@ -1514,7 +1514,10 @@ def admin_register():
 
 
 
-
+@app.route('/admin/functions', methods=['GET', 'POST'])
+def admin_functions():
+    adding_song_to_all_users()
+    return None
 
 
 
