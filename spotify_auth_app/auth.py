@@ -25,8 +25,6 @@ scheduler = BackgroundScheduler()
 # Replace these with your own Spotify credentials
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-#SPOTIPY_REDIRECT_URI = 'https://testspotify-af120bb16cf3.herokuapp.com/callback'
-#SPOTIPY_REDIRECT_URI = 'http://localhost:5000/callback'
 SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
 
@@ -93,31 +91,8 @@ def get_access_token(user_name):
 
 @app.route('/')
 def index():
-    result= f'''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-        <title>Welcome page</title>
-        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='welcome.css')}">
-
-    </head>
-    <body>
-    
-     <div class="container">
-            <div class="loader" id="loader"></div>
-            <div class="content" id="content">
-                <h1>Welcome to the Spotify Stats app!</h1>
-                <a href="/login" class="btn">Login with Spotify</a>
-            </div>
-        <!-- Loader -->
-    <script src="{url_for('static', filename='script.js')}"></script>
-    
-    </body>
-    </html>
-    '''
-    return result
+   
+    return redirect(url_for('front_page'))
 
 @app.route('/login')
 def login():
@@ -205,6 +180,52 @@ def callback():
 
 
     return redirect(url_for('welcome'))
+@app.route('/front_page')
+def front_page():
+  
+    
+    result= f'''
+    <!DOCTYPE html>
+    <html lang="en" dir="ltr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Statistics</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='front.css')}">
+
+    </head>
+    <body>
+    
+      <div class="container">
+            <div class="loader" id="loader"></div>
+            <div class="content" id="content">
+                <nav class="navbar">
+                    <div class="logo">
+                        <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
+                    </div>
+                    <a href="/login">
+                    <button> <span>Login</span>
+                    </button> </a>
+                    <ul class="nav-links">
+                        <li><a href="#">Users Tracks</a></li>
+                        <li><a href="#">Users Artists</a></li>
+                       
+                    </ul>
+                </nav>
+                 
+            </div>
+            <div class="overlay" id="overlay" >
+            <h1>Welcome to Your Spotify Stats</h1>
+            <p>Log in with Spotify to view your personalized music insights.</p>
+            </div>
+        </div>
+        <!-- Loader -->
+    <script src="{url_for('static', filename='front.js')}"></script>
+    
+    </body>
+    </html>
+    '''
+    return result
 @app.route('/submit_permission', methods=['POST'])
 def submit_permission():
     try:
@@ -268,7 +289,10 @@ def welcome():
             <div class="container">  
             <h1>Hello, {profile_json.get("display_name")}!</h1>
             <a href="/logout">
-            <button> <span>Logout</span>
+            <button class="logout-button"> <span>Logout</span>
+            </button> </a>
+            <a href="/front_page">
+            <button class="back-button" ><span>Back</span>
             </button> </a>
             <div class="Admin">
             <a href="{url_for('admin_login')}">
@@ -708,7 +732,7 @@ def Playlist_all_users_plays(current_user):
         else:   
             check_for_playlist(current_user_name,playlist_id)
             print("creating playlist  done for ",current_user_name)
-            store_log_details(current_user,f"creating playlist  done for {current_user_name}")
+            #store_log_details(current_user,f"creating playlist  done for {current_user_name}")
     else:
         print("no permission to create playlist for: ",current_user_name)
 
@@ -929,10 +953,7 @@ def  store_play_job(current_user):
 
 @app.route('/store_play')
 def store_play():
-    #store_play_job()
-    
-
-    
+  
     
     result= f'''
     <!DOCTYPE html>
@@ -940,7 +961,7 @@ def store_play():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>Welcome page</title>
+        <title>Statistics</title>
         <link rel="stylesheet" type="text/css" href="{url_for('static', filename='stats.css')}">
 
     </head>

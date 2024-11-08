@@ -153,7 +153,7 @@ h1 {
   transform: scaleX(1);
   transform-origin: left;
 }
-
+ 
 /* Logout button */
 /* From Uiverse.io by BHARGAVPATEL1244 */ 
 .container button {
@@ -164,8 +164,6 @@ h1 {
     font-family: inherit;
     font-size: inherit;
     position: absolute;
-    top: 30px; /* Distance from the top */
-    right: 20px; /* Distance from the right */
     display: inline-block;
     letter-spacing: 0.05rem;
     font-weight: 700;
@@ -176,18 +174,18 @@ h1 {
     color: ghostwhite;
    }
    
-   .container button span {
+   .container  button span {
     position: relative;
     z-index: 10;
     transition: color 0.4s;
    }
    
-   .container button:hover span {
+   .container  button:hover span {
     color: black;
    }
    
-   .container button::before,
-   .container button::after {
+   .container  button::before,
+   .container  button::after {
     position: absolute;
     top: 0;
     left: 0;
@@ -196,7 +194,7 @@ h1 {
     z-index: 0;
    }
    
-   .container button::before {
+   .container  button::before {
     content: "";
     background: #000;
     width: 120%;
@@ -205,10 +203,21 @@ h1 {
     transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
    }
    
-   .container button:hover::before {
+   .container  button:hover::before {
     transform: translate3d(100%, 0, 0);
-   }
+   } 
+  
+ /* Positioning for Logout Button (Right) */
+.logout-button {
+  top: 30px;
+  right: 20px;
+}
 
+/* Positioning for Back Button (Left) */
+.back-button {
+  top: 30px;
+  left: 20px; /* Positioning on the left */
+}
 /* Styling for modal */
 .modal {
   display: none;
