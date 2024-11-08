@@ -1516,8 +1516,10 @@ def admin_register():
 
 @app.route('/admin/functions', methods=['GET', 'POST'])
 def admin_functions():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('login'))
     adding_song_to_all_users()
-    return None
+    return "Function executed successfully!" 
 
 
 
