@@ -3,7 +3,7 @@ from flask import Flask, flash, jsonify, redirect, request, session, url_for,ren
 import requests
 import os
 from datetime import datetime,timedelta
-from .db_operations import store_recent_play,get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs, check_song_from_playlist, get_admin_user,store_admin_user, store_log_details,get_log_details
+from .db_operations import store_recent_play,get_all_recent_plays,save_users_to_db,get_user_access_token,get_all_users,check_for_playlist,get_playlist_tracks,update_user_permissions,get_user_playlistid,delete_old_songs, check_song_from_playlist, get_admin_user,store_admin_user, store_log_details,get_log_details,store_new_user
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from pytz import timezone
@@ -207,8 +207,11 @@ def front_page():
                     <button> <span>Login</span>
                     </button> </a>
                     <ul class="nav-links">
-                        <li><a href="#">Users Tracks</a></li>
-                        <li><a href="#">Users Artists</a></li>
+                        <li><a href="#">Users Top Tracks</a></li>
+                        <li><a href="#">Users Top Artists</a></li>
+                        <li><a href="#">Users Top Genres</a></li>
+                        <li><a href="#">Users Playlists</a></li>
+                        <li><a href="/new_users">New Users</a></li>
                        
                     </ul>
                 </nav>
@@ -221,6 +224,94 @@ def front_page():
         </div>
         <!-- Loader -->
     <script src="{url_for('static', filename='front.js')}"></script>
+    
+    </body>
+    </html>
+    '''
+    return result
+@app.route("/submit_spotify_ID", methods=["POST"])
+def submit():
+    data = request.get_json()
+
+    # Extract Spotify ID and email
+    spotify_id = data.get("spotifyId")
+    email = data.get("email")
+
+    # Validation
+    if not spotify_id or not email:
+        return jsonify({"message": "Spotify ID and email are required!"}), 400
+
+    # Insert into MongoDB
+    submission = {"spotifyId": spotify_id, "email": email}
+    store_new_user(submission)
+    
+
+    return jsonify({"message": "Submission successful!","redirect_url": url_for("success")}), 200
+@app.route("/success")
+def success():
+    return redirect(url_for('front_page'))
+
+
+@app.route('/new_users')
+def new_users():
+    result= f'''
+    <!DOCTYPE html>
+    <html lang="en" dir="ltr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Statistics</title>
+        <link rel="stylesheet" type="text/css" href="{url_for('static', filename='newusers.css')}">
+
+    </head>
+    <body>
+    
+      <div class="container">
+            <div class="loader" id="loader"></div>
+            <div class="content" id="content">
+                <nav class="navbar">
+                    <div class="logo">
+                        <img src="{url_for('static', filename='logo.svg')}" alt="Logo">
+                    </div>
+                    <a href="/login">
+                    <button class="logout-button" > <span>Login</span>
+                    </button> </a>
+                    <ul class="nav-links">
+                       
+                       
+                    </ul>
+                </nav>
+                 
+            </div>
+             <div class="Report" id="Report">
+            
+                    <form class="form" id="spotifyForm">
+                    <p class="form-title">Submit Spotify ID</p>
+                        <div class="input-container">
+                         <input id="spotifyId" name="spotifyId" placeholder="Spotify ID" type="text" required>
+                        
+                    </div>
+                    <div class="input-container">
+                        <input id="email" name="email" placeholder="Email" type="email" required>
+
+
+                        </div>
+                        <button class="submit" type="submit">
+                        Submit
+                    </button>
+
+                    <p class="signup-link">
+                       Need help?
+                        <a href="https://community.spotify.com/t5/FAQs/Finding-login-details/ta-p/5182392#:~:text=Find%20your%20profile%20via%20search,si%3D%22%20is%20your%20ID.">Spotify FAQ</a>
+                    </p>
+                </form>
+
+             
+             </div>
+       
+        </div>
+        <!-- Loader -->
+    <script src="{url_for('static', filename='newusers.js')}"></script>
     
     </body>
     </html>
@@ -1519,8 +1610,7 @@ def admin_functions():
     if not session.get('admin_logged_in'):
         return redirect(url_for('login'))
     adding_song_to_all_users()
-    return "Function executed successfully!" 
-
+    return redirect(url_for('admin_dashboard'))
 
 
 

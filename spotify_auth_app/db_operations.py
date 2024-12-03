@@ -402,6 +402,7 @@ except pymongo.errors.ConnectionError as e:
     print(f"Could not connect to MongoDB: {e}")
 
 
+
 def get_admin_user(username):
     """Fetches the admin user from the MongoDB collection."""
     try:
@@ -422,6 +423,10 @@ def store_admin_user(admin_data):
     admincollection =  Admin_db["admins"]
     Admin_db.admins.insert_one(admin_data)
 
+def store_new_user(user_data):
+    """Stores a new user in the MongoDB collection."""
+    usercollection = Admin_db["new_users"]
+    usercollection.insert_one(user_data)
 def store_log_details(user_name,details):
     """Stores the login details in the MongoDB collection."""
     plays_collection = Admin_db["log_details"]
