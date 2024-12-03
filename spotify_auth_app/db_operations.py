@@ -299,7 +299,7 @@ def addsong_to_playlist(user_name,playlist_id,song_details,Date):
    # print(song_id,song_name)
 
      # Check if the song already exists
-    existing_user = playlist_collection.find_one({'$and': [{'Song_id': song_id}, {'Song_name': {'$regex': song_name, '$options': 'i'}}]})
+    existing_user = playlist_collection.find_one({'Song_id': song_id})
     
     if existing_user:
         print("song already exists in the playlist")
